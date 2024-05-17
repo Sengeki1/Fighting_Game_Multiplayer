@@ -9,7 +9,8 @@ class Player(pg.sprite.Sprite):
         self.frame_index = 0
         self.animation_speed = 0.19
         self.image = self.animations['Idle'][self.frame_index] 
-        self.rect = self.image.get_rect(center = pos)
+        self.rect = self.image.get_rect(center=pos)
+        self.new_rect = pg.Rect(pos[0] - 20, pos[1], 80, 125)
 
         # player movement
         self.gravity = 0
@@ -60,29 +61,34 @@ class Player(pg.sprite.Sprite):
                 if not self.ready:
                     self.gravity += 20
 
-            if key[pg.K_RIGHT]:
+            if key[pg.K_RIGHT] and self.rect.right < 2000:
                 if self.ready:
                     self.rect.x += 7
+                    self.new_rect.x += 7
                     self.facing_right = True
                     self.direction.x = 1
                 else:
                     self.rect.x += 3
+                    self.new_rect.x += 3
                     self.facing_right = True
                     self.direction.x = 1
 
                 
-            elif key[pg.K_LEFT]:
+            elif key[pg.K_LEFT] and self.rect.left > -100:
                 if self.ready:
                     self.rect.x -= 7 
+                    self.new_rect.x -= 7
                     self.facing_right = False
                     self.direction.x = -1
                 else:
                     self.rect.x -= 3
+                    self.new_rect.x -= 3
                     self.facing_right = False
                     self.direction.x = -1
                 
             else:
                 self.rect.x += 0
+                self.new_rect.x += 0
                 self.direction.x = 0
 
             if key[pg.K_q]:
@@ -101,25 +107,22 @@ class Player(pg.sprite.Sprite):
         elif self.e == 1:
             self.status = 'Attack2'
             self.e = 0
-        
-        if self.facing_right:
-            self.hitbox = pg.Rect(self.rect.centerx + 40, self.rect.y + 130, self.rect.width - 350, self.rect.height - 130)
-        else:
-            self.hitbox = pg.Rect(self.rect.centerx - 200, self.rect.y + 130, self.rect.width - 350, self.rect.height - 130)
 
     def apply_gravity(self) -> None:
         self.gravity += 0.8
         self.rect.y += self.gravity 
+        self.new_rect.y += self.gravity
         self.direction.y += 0.8
         
         if self.rect.bottom >= 980:
             self.rect.bottom = 980
+            self.new_rect.bottom = 980
             self.direction.y = 0
         
     def get_status(self) -> None:
         if not self.ready:
             if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
-                if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack1']) - 1:
+                if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
                     self.ready = True
 
         if self.ready == False:

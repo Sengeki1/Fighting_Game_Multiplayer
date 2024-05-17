@@ -9,6 +9,9 @@ class Main():
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
         self.clock = pg.time.Clock()
         self.running = True
+        self.hitbox = pg.Rect(0, 0, 0, 0)
+
+        # Font
         self.ratio = 1
         self.font = pg.font.Font('Font/Pixeltype.ttf', 90)
         self.font2 = pg.font.Font('Font/Pixeltype.ttf', 160)
@@ -23,7 +26,6 @@ class Main():
 
         # Particle
         self.particle_group = pg.sprite.Group()
-        self.hitbox = pg.Rect(0, 0, 0, 0)
 
         # Player
         self.player1 = pg.sprite.GroupSingle()
@@ -42,10 +44,12 @@ class Main():
                     if event.key == pg.K_ESCAPE:
                         self.running = False
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_q and self.player1_sprite.ready:
+                    if event.key == pg.K_q and self.player2_sprite.ready or event.key == pg.K_q and self.player1_sprite.ready:
                         self.player1_sprite.attack() # pressed once
-                    if event.key == pg.K_e and self.player1_sprite.ready:
+                        self.player2_sprite.attack()
+                    if event.key == pg.K_e and self.player2_sprite.ready or event.key == pg.K_e and self.player1_sprite.ready:
                         self.player1_sprite.attack()
+                        self.player2_sprite.attack()
 
             self.clock.tick(60)
                     
@@ -87,8 +91,21 @@ class Main():
             self.player1.update()
             self.player2.update()
 
-            # if not self.player1_sprite.ready:
-            #     pg.draw.rect(self.screen, (0, 255, 0), self.player1_sprite.hitbox)
+            if not self.player2_sprite.ready:
+                if self.player2_sprite.facing_right:
+                    self.hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
+                else:
+                    self.hitbox = pg.Rect(self.player2_sprite.rect.centerx - 210, self.player2_sprite.rect.y + 80, 150, 170)
+                pg.draw.rect(self.screen, (0, 255, 0), self.hitbox)
+            
+            if not self.player1_sprite.ready:
+                if self.player1_sprite.facing_right:
+                    self.hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+                else:
+                    self.hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+                pg.draw.rect(self.screen, (0, 255, 0), self.hitbox)
+            
+            pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
 
             pg.display.flip()
 
