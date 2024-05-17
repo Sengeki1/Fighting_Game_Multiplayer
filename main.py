@@ -9,6 +9,9 @@ class Main():
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
         self.clock = pg.time.Clock()
         self.running = True
+        self.ratio = 1
+        self.font = pg.font.Font('Font/Pixeltype.ttf', 90)
+        self.font2 = pg.font.Font('Font/Pixeltype.ttf', 160)
 
         # Background
         self.background = pg.image.load('Sprites/Background/Background.png').convert_alpha()
@@ -57,6 +60,27 @@ class Main():
             self.screen.blit(self.layer2, (0, 0))
             self.screen.blit(self.layer1, (0, 0))
             self.particle_group.draw(self.screen)
+
+            # health bar
+            ## Player1
+            player_1 = self.font.render(f'Player 1', False, (255, 255, 255))
+            player_1_rect = player_1.get_rect(center = (230, 45))
+            self.screen.blit(player_1, player_1_rect)
+            pg.draw.rect(self.screen, "black", (100, 75, 600, 50))
+            pg.draw.rect(self.screen, "red", (105, 80, 590, 40))
+            pg.draw.rect(self.screen, "green", (105, 80, 590 * self.ratio, 40))
+
+            ## Player 2
+            player_2 = self.font.render(f'Player 2', False, (255, 255, 255))
+            player_2_rect = player_2.get_rect(center = (1335, 45))
+            self.screen.blit(player_2, player_2_rect)
+            pg.draw.rect(self.screen, "black", (1200, 75, 600, 50))
+            pg.draw.rect(self.screen, "red", (1205, 80, 590, 40))
+            pg.draw.rect(self.screen, "green", (1205, 80, 590 * self.ratio, 40))
+
+            player_2 = self.font2.render(f'VS', False, (255, 255, 255))
+            player_2_rect = player_2.get_rect(center = (950, 120))
+            self.screen.blit(player_2, player_2_rect)
 
             # update
             self.particle_group.update()
