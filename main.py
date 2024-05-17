@@ -24,9 +24,14 @@ class Main():
         # Player
         self.player1 = pg.sprite.GroupSingle()
         self.player2 = pg.sprite.GroupSingle()
-        self.player1.add(Player((300, 834), "Character 1"))
-        self.player2.add(Player((700, 854), "Character 2"))
-    
+        self.player1_sprite = Player((300, 834), "Character 1")
+        self.player1.add(self.player1_sprite)
+        self.player2_sprite = Player((700, 854), "Character 2")
+        self.player2.add(self.player2_sprite)
+
+        # Movement
+        self.attack_twice_count = 0
+
     def run(self) -> None:
         while self.running:
             for event in pg.event.get():
@@ -35,7 +40,16 @@ class Main():
                 elif event.type == pg.KEYDOWN or event.type == pg.KEYUP:
                     if event.key == pg.K_ESCAPE:
                         self.running = False
-        
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_q and self.player1_sprite.rect.bottom == 980:
+                        self.player1_sprite.attacking = True
+                        self.attack_twice_count += 1
+                        if self.attack_twice_count % 2 == 0:
+                            self.player1_sprite.attack_twice = True
+                        else:
+                            self.player1_sprite.attack_twice = False
+                        #pg.Rect(self.rect.centerx + 40, self.rect.y + 100, self.rect.width - 350, self.rect.height - 100)
+
             self.clock.tick(60)
                     
             self.screen.fill((0, 0, 0))
@@ -45,6 +59,7 @@ class Main():
             self.screen.blit(self.background, (0, -300))
             self.player1.draw(self.screen)
             self.player2.draw(self.screen)
+
             self.screen.blit(self.layer2, (0, 0))
             self.screen.blit(self.layer1, (0, 0))
             self.particle_group.draw(self.screen)
@@ -53,6 +68,8 @@ class Main():
             self.particle_group.update()
             self.player1.update()
             self.player2.update()
+            self.player1_sprite.attack1()
+            self.player1_sprite.attack2()
             pg.display.flip()
 
         pg.quit()

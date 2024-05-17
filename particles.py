@@ -15,7 +15,7 @@ class Particle(pg.sprite.Sprite):
     def create_surface(self) -> None:
         self.image = pg.Surface((50, 50)).convert_alpha()
         self.image.set_colorkey("black")
-        pg.draw.circle(self.image, self.color, center=(25, 25), radius=4, draw_bottom_left=True)
+        pg.draw.circle(self.image, self.color, center=(25, 25), radius=4, draw_top_left=True)
         self.rect = self.image.get_rect(center=(self.pos))
     
     def check_pos(self) -> None:
