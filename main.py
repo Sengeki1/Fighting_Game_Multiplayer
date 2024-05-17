@@ -20,6 +20,7 @@ class Main():
 
         # Particle
         self.particle_group = pg.sprite.Group()
+        self.hitbox = pg.Rect(0, 0, 0, 0)
 
         # Player
         self.player1 = pg.sprite.GroupSingle()
@@ -28,9 +29,6 @@ class Main():
         self.player1.add(self.player1_sprite)
         self.player2_sprite = Player((700, 854), "Character 2")
         self.player2.add(self.player2_sprite)
-
-        # Movement
-        self.attack_twice_count = 0
 
     def run(self) -> None:
         while self.running:
@@ -41,14 +39,10 @@ class Main():
                     if event.key == pg.K_ESCAPE:
                         self.running = False
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_q and self.player1_sprite.rect.bottom == 980:
-                        self.player1_sprite.attacking = True
-                        self.attack_twice_count += 1
-                        if self.attack_twice_count % 2 == 0:
-                            self.player1_sprite.attack_twice = True
-                        else:
-                            self.player1_sprite.attack_twice = False
-                        #pg.Rect(self.rect.centerx + 40, self.rect.y + 100, self.rect.width - 350, self.rect.height - 100)
+                    if event.key == pg.K_q and self.player1_sprite.ready:
+                        self.player1_sprite.attack() # pressed once
+                    if event.key == pg.K_e and self.player1_sprite.ready:
+                        self.player1_sprite.attack()
 
             self.clock.tick(60)
                     
@@ -68,8 +62,10 @@ class Main():
             self.particle_group.update()
             self.player1.update()
             self.player2.update()
-            self.player1_sprite.attack1()
-            self.player1_sprite.attack2()
+
+            # if not self.player1_sprite.ready:
+            #     pg.draw.rect(self.screen, (0, 255, 0), self.player1_sprite.hitbox)
+
             pg.display.flip()
 
         pg.quit()
