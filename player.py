@@ -21,9 +21,19 @@ class Player(pg.sprite.Sprite):
         self.q = 0
         self.e = 0
 
+        # Health Bar
+        self.hp = 590
+        self.hitted = False
+
         # player status
         self.status = 'Idle'
         self.facing_right = True
+
+    def get_damage(self, amount):
+        if self.hp <= 0:
+            self.hp = 0
+        elif self.hp > 0:
+            self.hp -= amount
 
     def import_character_assets(self) -> None:
         character_path = f"Sprites/{self.character}/"
@@ -53,7 +63,7 @@ class Player(pg.sprite.Sprite):
 
     def input(self) -> None:
         key = pg.key.get_pressed()
-        if self.character == "Character 1":
+        if self.character == "Character 2":
             if key[pg.K_SPACE] and self.rect.bottom == 980:
                 self.gravity = -20
                 self.direction.y = -16
@@ -99,6 +109,9 @@ class Player(pg.sprite.Sprite):
                 self.attack()
     
     def attack(self):
+        if self.hitted:
+            self.get_damage(20)
+            self.hitted = False
         self.ready = False
         self.attack_time = pg.time.get_ticks()
         if self.q == 1:
@@ -125,13 +138,13 @@ class Player(pg.sprite.Sprite):
                 if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
                     self.ready = True
 
-        if self.ready == False:
-            if self.q == 1:
-                self.status = 'Attack1'
-                self.q = 0
-            elif self.e == 1:
-                self.status = 'Attack2'
-                self.e = 0
+        # if self.ready == False:
+        #     if self.q == 1:
+        #         self.status = 'Attack1'
+        #         self.q = 0
+        #     elif self.e == 1:
+        #         self.status = 'Attack2'
+        #         self.e = 0
         else:
             if self.direction.y < 0:
                 self.status = "Jump"

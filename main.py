@@ -9,7 +9,11 @@ class Main():
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
         self.clock = pg.time.Clock()
         self.running = True
+        
+        # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
+        self.player1_hitbox = pg.Rect(0, 0, 0, 0)
+        self.player2_hitbox = pg.Rect(0, 0, 0, 0)
 
         # Font
         self.ratio = 1
@@ -72,7 +76,7 @@ class Main():
             self.screen.blit(player_1, player_1_rect)
             pg.draw.rect(self.screen, "black", (100, 75, 600, 50))
             pg.draw.rect(self.screen, "red", (105, 80, 590, 40))
-            pg.draw.rect(self.screen, "green", (105, 80, 590 * self.ratio, 40))
+            pg.draw.rect(self.screen, "green", (105, 80, self.player1_sprite.hp, 40))
 
             ## Player 2
             player_2 = self.font.render(f'Player 2', False, (255, 255, 255))
@@ -80,7 +84,7 @@ class Main():
             self.screen.blit(player_2, player_2_rect)
             pg.draw.rect(self.screen, "black", (1200, 75, 600, 50))
             pg.draw.rect(self.screen, "red", (1205, 80, 590, 40))
-            pg.draw.rect(self.screen, "green", (1205, 80, 590 * self.ratio, 40))
+            pg.draw.rect(self.screen, "green", (1205, 80, self.player2_sprite.hp, 40))
 
             player_2 = self.font2.render(f'VS', False, (255, 255, 255))
             player_2_rect = player_2.get_rect(center = (950, 120))
@@ -93,21 +97,27 @@ class Main():
 
             if not self.player2_sprite.ready:
                 if self.player2_sprite.facing_right:
-                    self.hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
+                    self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
                 else:
-                    self.hitbox = pg.Rect(self.player2_sprite.rect.centerx - 210, self.player2_sprite.rect.y + 80, 150, 170)
-                pg.draw.rect(self.screen, (0, 255, 0), self.hitbox)
+                    self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx - 210, self.player2_sprite.rect.y + 80, 150, 170)
+                #self.attack_hitbox_2 = pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
             
             if not self.player1_sprite.ready:
                 if self.player1_sprite.facing_right:
-                    self.hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+                    self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
                 else:
-                    self.hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
-                pg.draw.rect(self.screen, (0, 255, 0), self.hitbox)
+                    self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+                #self.attack_hitbox_1 = pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
             
-            pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+            #self.player1_hitbox = pg.draw.rect(self.screen, (0, 0, 0), self.player1_sprite.new_rect)
+            #self.player2_hitbox = pg.draw.rect(self.screen, (0, 0, 0), self.player2_sprite.new_rect)
 
-            pg.display.flip()
+            if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
+                self.player2_sprite.hitted = True
+            elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite.ready:
+                self.player1_sprite.hitted = True
+
+            pg.display.update()
 
         pg.quit()
 
