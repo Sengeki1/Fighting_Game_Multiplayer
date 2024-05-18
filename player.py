@@ -77,6 +77,10 @@ class Player(pg.sprite.Sprite):
                     self.new_rect.x += 7
                     self.facing_right = True
                     self.direction.x = 1
+
+                    if key[pg.K_LSHIFT]:
+                        self.rect.x += 4
+                        self.animation_speed = 0.20
                 else:
                     self.rect.x += 3
                     self.new_rect.x += 3
@@ -90,6 +94,10 @@ class Player(pg.sprite.Sprite):
                     self.new_rect.x -= 7
                     self.facing_right = False
                     self.direction.x = -1
+
+                    if key[pg.K_LSHIFT]:
+                        self.rect.x -= 4
+                        self.animation_speed = 0.20
                 else:
                     self.rect.x -= 3
                     self.new_rect.x -= 3
@@ -138,13 +146,6 @@ class Player(pg.sprite.Sprite):
                 if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
                     self.ready = True
 
-        # if self.ready == False:
-        #     if self.q == 1:
-        #         self.status = 'Attack1'
-        #         self.q = 0
-        #     elif self.e == 1:
-        #         self.status = 'Attack2'
-        #         self.e = 0
         else:
             if self.direction.y < 0:
                 self.status = "Jump"
