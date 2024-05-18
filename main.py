@@ -13,6 +13,7 @@ class Main():
         self.scoreA = 0
         self.scoreB = 0
         self.secs = 500
+        self.init_timer = 100
         
         # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
@@ -23,6 +24,7 @@ class Main():
         self.ratio = 1
         self.font = pg.font.Font('Font/Pixeltype.ttf', 90)
         self.font2 = pg.font.Font('Font/Pixeltype.ttf', 160)
+        self.font3 = pg.font.Font('Font/Pixeltype.ttf', 400)
         self.restart_surf = self.font2.render('Restart', False, (255, 255, 255))
         self.restart_rect = self.restart_surf.get_rect(center = (950, 550))
 
@@ -66,8 +68,10 @@ class Main():
                     if event.type == pg.MOUSEBUTTONDOWN:
                         if self.restart_rect.collidepoint(event.pos):
                             self.game_active = True
+                            self.init_timer = 100
 
-            if self.game_active:    
+            if self.game_active:
+
                 self.screen.fill((0, 0, 0))
                 Particle(self.particle_group)
 
@@ -156,6 +160,7 @@ class Main():
                         self.player2_sprite.get_health()
                         self.secs = 500
                         self.scoreB += 1
+                        self.init_timer = 100
 
                 if self.player2_sprite.lose:
                     win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
@@ -173,13 +178,21 @@ class Main():
                         self.player2_sprite.get_health()
                         self.secs = 500
                         self.scoreA += 1
+                        self.init_timer = 100
 
                 if self.scoreA == 3 or self.scoreB == 3:  
                     self.game_active = False
                     self.scoreA = 0
                     self.scoreB = 0
-                    self.player1_sprite.rect.x = 700
-                    self.player2_sprite.rect.x = 1100
+                    self.player1_sprite.rect.x = 450
+                    self.player2_sprite.rect.x = 950
+
+                if self.init_timer >= 0:
+                    self.init_timer -= 1
+
+                    message = self.font3.render(f'FIGHT', False, (255, 255, 255))
+                    message_rect = message.get_rect(center = (950, 590))
+                    self.screen.blit(message, message_rect)
                 
             else:
                 self.screen.fill((0, 0, 0))

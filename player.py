@@ -70,7 +70,7 @@ class Player(pg.sprite.Sprite):
     def input(self) -> None:
         if self.lose == False:
             key = pg.key.get_pressed()
-            if self.character == "Character 2":
+            if self.character == "Character 1":
                 if key[pg.K_SPACE] and self.rect.bottom == 980:
                     self.gravity = -20
                     self.direction.y = -16
