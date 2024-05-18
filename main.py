@@ -2,6 +2,7 @@ import pygame as pg
 from settings import *
 from player import Player
 from particles import Particle
+from support import *
 
 class Main():
     def __init__(self) -> None:
@@ -13,6 +14,7 @@ class Main():
         self.scoreA = 0
         self.scoreB = 0
         self.secs = 500
+        self.frame_index = 0
 
         # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
@@ -126,8 +128,8 @@ class Main():
 
                 # Hitboxes
                 self.check_hitbox()
-                #pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
-                #pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
+                pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
 
                 # Collision
                 if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
@@ -154,12 +156,23 @@ class Main():
                     win_message = self.font2.render(f'Player 2 Wins!', False, (255, 255, 255))
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
+
+                    death_animation = import_folder('Sprites/Character 1/Death', 'Character 1')
+                    self.frame_index += 0.18
+                    if self.frame_index >= len(death_animation):
+                        self.frame_index = len(death_animation) - 1
+
+                    image = death_animation[int(self.frame_index)]
+                    self.player1_sprite.image = image
+                    
                     if self.secs >= 0 and self.scoreB < 2:
                         self.secs -= 1
 
+                        self.player1_sprite.hitted = False
                         self.player2_sprite.hitted = False
                         self.player1_sprite.stop = True
                         self.player2_sprite.stop = True
+                        self.player2_sprite.status = "Idle"
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
@@ -172,20 +185,31 @@ class Main():
                         self.init_timer = 100
                         self.player1_sprite.stop = False
                         self.player2_sprite.stop = False
-                        self.check_hitbox()
                         self.player1_sprite.new_rect.x = 450 + 200
                         self.player2_sprite.new_rect.x = 950 + 150
+                        self.frame_index = 0
 
                 if self.player2_sprite.lose:
                     win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
+                    
+                    death_animation = import_folder('Sprites/Character 2/Death', 'Character 2')
+                    self.frame_index += 0.18
+                    if self.frame_index >= len(death_animation):
+                        self.frame_index = len(death_animation) - 1
+
+                    image = death_animation[int(self.frame_index)]
+                    self.player2_sprite.image = image
+
                     if self.secs >= 0 and self.scoreA < 2:
                         self.secs -= 1
 
                         self.player1_sprite.hitted = False
+                        self.player2_sprite.hitted = False
                         self.player1_sprite.stop = True
                         self.player2_sprite.stop = True
+                        self.player1_sprite.status = "Idle"
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
@@ -198,9 +222,9 @@ class Main():
                         self.init_timer = 100
                         self.player1_sprite.stop = False
                         self.player2_sprite.stop = False
-                        self.check_hitbox()
                         self.player1_sprite.new_rect.x = 450 + 200
                         self.player2_sprite.new_rect.x = 950 + 150
+                        self.frame_index = 0
 
                 if self.scoreA == 3 or self.scoreB == 3:  
                     self.game_active = False
@@ -208,6 +232,11 @@ class Main():
                     self.scoreB = 0
                     self.player1_sprite.rect.x = 450
                     self.player2_sprite.rect.x = 950
+
+                    self.player1_sprite.get_health()
+                    self.player2_sprite.get_health()
+
+                    self.check_hitbox()
 
                 if self.init_timer >= 0:
                     self.init_timer -= 1
@@ -218,6 +247,8 @@ class Main():
 
                     self.player1_sprite.get_health()
                     self.player2_sprite.get_health()
+
+                    self.check_hitbox()
                 
             else:
                 if self.init_message:
@@ -248,6 +279,11 @@ class Main():
                 else:
                     self.screen.fill((0, 0, 0))
                     self.screen.blit(self.restart_surf, self.restart_rect)
+
+                    self.player1_sprite.get_health()
+                    self.player2_sprite.get_health()
+
+                    self.check_hitbox()
 
             pg.display.update()
             self.clock.tick(60)

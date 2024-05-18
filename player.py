@@ -88,6 +88,7 @@ class Player(pg.sprite.Sprite):
 
                         if key[pg.K_LSHIFT]:
                             self.rect.x += 4
+                            self.new_rect.x += 4
                             self.animation_speed = 0.20
                     else:
                         self.rect.x += 3
@@ -105,6 +106,7 @@ class Player(pg.sprite.Sprite):
 
                         if key[pg.K_LSHIFT]:
                             self.rect.x -= 4
+                            self.new_rect.x -= 4
                             self.animation_speed = 0.20
                     else:
                         self.rect.x -= 3
@@ -156,15 +158,16 @@ class Player(pg.sprite.Sprite):
                     self.hitted = False
 
         else:
-            if self.direction.y < 0:
-                self.status = "Jump"
-            elif self.direction.y > 0:
-                self.status = "Fall"
-            else:
-                if self.direction.x != 0:
-                    self.status = "Run"
+            if self.stop == False:
+                if self.direction.y < 0:
+                    self.status = "Jump"
+                elif self.direction.y > 0:
+                    self.status = "Fall"
                 else:
-                    self.status = "Idle"
+                    if self.direction.x != 0:
+                        self.status = "Run"
+                    else:
+                        self.status = "Idle"
 
     def recharge(self):
         if self.ready == False:
