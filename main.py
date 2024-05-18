@@ -56,13 +56,13 @@ class Main():
                 self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
             else:
                 self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx - 170, self.player2_sprite.rect.y + 80, 150, 170)
-            pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
+            #pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
         if not self.player1_sprite.ready:
             if self.player1_sprite.facing_right:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
             else:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
-            pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
+            #pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
 
     def run(self) -> None:
         while self.running:
@@ -126,8 +126,8 @@ class Main():
 
                 # Hitboxes
                 self.check_hitbox()
-                pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
-                pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
+                #pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                #pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
 
                 # Collision
                 if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
