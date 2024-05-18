@@ -9,12 +9,11 @@ class Main():
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
         self.clock = pg.time.Clock()
         self.running = True
-        self.game_active = True
+        self.game_active = False
         self.scoreA = 0
         self.scoreB = 0
         self.secs = 500
-        self.init_timer = 100
-        
+
         # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
         self.player1_hitbox = pg.Rect(0, 0, 0, 0)
@@ -27,6 +26,10 @@ class Main():
         self.font3 = pg.font.Font('Font/Pixeltype.ttf', 400)
         self.restart_surf = self.font2.render('Restart', False, (255, 255, 255))
         self.restart_rect = self.restart_surf.get_rect(center = (950, 550))
+
+        # init
+        self.init_timer = 100
+        self.init_message = True
 
         # Background
         self.background = pg.image.load('Sprites/Background/Background.png').convert_alpha()
@@ -47,6 +50,20 @@ class Main():
         self.player2_sprite = Player((1100, 854), "Character 2")
         self.player2.add(self.player2_sprite)
 
+    def check_hitbox(self):
+        if not self.player2_sprite.ready:
+            if self.player2_sprite.facing_right:
+                self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
+            else:
+                self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx - 170, self.player2_sprite.rect.y + 80, 150, 170)
+            pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
+        if not self.player1_sprite.ready:
+            if self.player1_sprite.facing_right:
+                self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+            else:
+                self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+            pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
+
     def run(self) -> None:
         while self.running:
             for event in pg.event.get():
@@ -56,19 +73,16 @@ class Main():
                     if event.key == pg.K_ESCAPE:
                         self.running = False
 
-                if self.game_active:
-                    if event.type == pg.KEYDOWN:
-                        if event.key == pg.K_q and self.player2_sprite.ready or event.key == pg.K_q and self.player1_sprite.ready:
-                            self.player1_sprite.attack() # pressed once
-                            self.player2_sprite.attack()
-                        if event.key == pg.K_e and self.player2_sprite.ready or event.key == pg.K_e and self.player1_sprite.ready:
-                            self.player1_sprite.attack()
-                            self.player2_sprite.attack()
-                else:
+                if self.game_active == False:
                     if event.type == pg.MOUSEBUTTONDOWN:
                         if self.restart_rect.collidepoint(event.pos):
                             self.game_active = True
                             self.init_timer = 100
+                    if event.type == pg.KEYDOWN:
+                        if event.key == pg.K_RETURN:
+                            self.game_active = True
+                            self.init_timer = 100
+                            self.init_message = False
 
             if self.game_active:
 
@@ -111,17 +125,9 @@ class Main():
                 self.player2.update()
 
                 # Hitboxes
-                if not self.player2_sprite.ready:
-                    if self.player2_sprite.facing_right:
-                        self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
-                    else:
-                        self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx - 210, self.player2_sprite.rect.y + 80, 150, 170)
-                
-                if not self.player1_sprite.ready:
-                    if self.player1_sprite.facing_right:
-                        self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
-                    else:
-                        self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
+                self.check_hitbox()
+                pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
 
                 # Collision
                 if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
@@ -151,16 +157,24 @@ class Main():
                     if self.secs >= 0 and self.scoreB < 2:
                         self.secs -= 1
 
+                        self.player2_sprite.hitted = False
+                        self.player1_sprite.stop = True
+                        self.player2_sprite.stop = True
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
                     else:
                         self.player1_sprite.lose = False
-                        self.player1_sprite.get_health()
-                        self.player2_sprite.get_health()
                         self.secs = 500
                         self.scoreB += 1
+                        self.player1_sprite.rect.x = 450
+                        self.player2_sprite.rect.x = 950
                         self.init_timer = 100
+                        self.player1_sprite.stop = False
+                        self.player2_sprite.stop = False
+                        self.check_hitbox()
+                        self.player1_sprite.new_rect.x = 450 + 200
+                        self.player2_sprite.new_rect.x = 950 + 150
 
                 if self.player2_sprite.lose:
                     win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
@@ -169,16 +183,24 @@ class Main():
                     if self.secs >= 0 and self.scoreA < 2:
                         self.secs -= 1
 
+                        self.player1_sprite.hitted = False
+                        self.player1_sprite.stop = True
+                        self.player2_sprite.stop = True
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
                     else:
                         self.player2_sprite.lose = False
-                        self.player1_sprite.get_health()
-                        self.player2_sprite.get_health()
                         self.secs = 500
                         self.scoreA += 1
+                        self.player1_sprite.rect.x = 450
+                        self.player2_sprite.rect.x = 950
                         self.init_timer = 100
+                        self.player1_sprite.stop = False
+                        self.player2_sprite.stop = False
+                        self.check_hitbox()
+                        self.player1_sprite.new_rect.x = 450 + 200
+                        self.player2_sprite.new_rect.x = 950 + 150
 
                 if self.scoreA == 3 or self.scoreB == 3:  
                     self.game_active = False
@@ -193,10 +215,39 @@ class Main():
                     message = self.font3.render(f'FIGHT', False, (255, 255, 255))
                     message_rect = message.get_rect(center = (950, 590))
                     self.screen.blit(message, message_rect)
+
+                    self.player1_sprite.get_health()
+                    self.player2_sprite.get_health()
                 
             else:
-                self.screen.fill((0, 0, 0))
-                self.screen.blit(self.restart_surf, self.restart_rect)
+                if self.init_message:
+                    self.message = self.font.render(f'Press <Enter> to start!', False, (255, 255, 255))
+                    self.message_rect = self.message.get_rect(center = (960, 300))
+                    self.screen.blit(self.message, self.message_rect)
+
+                    self.keybinds = self.font.render(f'Keybinds:', False, (255, 255, 255))
+                    self.keybinds_rect = self.keybinds.get_rect(center = (960, 450))
+                    self.screen.blit(self.keybinds, self.keybinds_rect)
+
+                    self.key_tutorial1 = self.font.render(f'Press <Q> to perform Attack 1!', False, (255, 255, 255))
+                    self.key_tutorial1_rect = self.key_tutorial1.get_rect(center = (960, 550))
+                    self.screen.blit(self.key_tutorial1, self.key_tutorial1_rect)
+
+                    self.key_tutorial2 = self.font.render(f'Press <E> to perform Attack 2!', False, (255, 255, 255))
+                    self.key_tutorial2_rect = self.key_tutorial2.get_rect(center = (960, 650))
+                    self.screen.blit(self.key_tutorial2, self.key_tutorial2_rect)
+
+                    self.key_tutorial3= self.font.render(f'Press <LSHIFT> to perform a Dash!', False, (255, 255, 255))
+                    self.key_tutorial3_rect = self.key_tutorial3.get_rect(center = (960, 750))
+                    self.screen.blit(self.key_tutorial3, self.key_tutorial3_rect)
+
+                    self.final_message= self.font.render(f'Enjoy<3', False, (255, 255, 255))
+                    self.final_message_rect = self.final_message.get_rect(center = (960, 1000))
+                    self.screen.blit(self.final_message, self.final_message_rect)
+
+                else:
+                    self.screen.fill((0, 0, 0))
+                    self.screen.blit(self.restart_surf, self.restart_rect)
 
             pg.display.update()
             self.clock.tick(60)

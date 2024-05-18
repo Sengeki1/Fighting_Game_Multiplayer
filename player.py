@@ -11,6 +11,7 @@ class Player(pg.sprite.Sprite):
         self.image = self.animations['Idle'][self.frame_index] 
         self.rect = self.image.get_rect(center=pos)
         self.new_rect = pg.Rect(pos[0] - 20, pos[1], 80, 125)
+        self.stop = False
 
         # player movement
         self.gravity = 0
@@ -70,7 +71,7 @@ class Player(pg.sprite.Sprite):
     def input(self) -> None:
         if self.lose == False:
             key = pg.key.get_pressed()
-            if self.character == "Character 1":
+            if self.stop == False:
                 if key[pg.K_SPACE] and self.rect.bottom == 980:
                     self.gravity = -20
                     self.direction.y = -16
@@ -125,8 +126,8 @@ class Player(pg.sprite.Sprite):
     
     def attack(self):
         if self.hitted:
-            self.get_damage(600)
             self.hitted = False
+            self.get_damage(15)
         self.ready = False
         self.attack_time = pg.time.get_ticks()
         if self.q == 1:
@@ -152,6 +153,7 @@ class Player(pg.sprite.Sprite):
             if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
                 if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
                     self.ready = True
+                    self.hitted = False
 
         else:
             if self.direction.y < 0:
