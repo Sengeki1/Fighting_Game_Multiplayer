@@ -37,6 +37,9 @@ class Player(pg.sprite.Sprite):
         elif self.hp > 0:
             self.hp -= amount
             self.lose = False
+    
+    def get_health(self):
+        self.hp = 590
 
     def import_character_assets(self) -> None:
         character_path = f"Sprites/{self.character}/"
@@ -67,7 +70,7 @@ class Player(pg.sprite.Sprite):
     def input(self) -> None:
         if self.lose == False:
             key = pg.key.get_pressed()
-            if self.character == "Character 1":
+            if self.character == "Character 2":
                 if key[pg.K_SPACE] and self.rect.bottom == 980:
                     self.gravity = -20
                     self.direction.y = -16
@@ -122,7 +125,7 @@ class Player(pg.sprite.Sprite):
     
     def attack(self):
         if self.hitted:
-            self.get_damage(15)
+            self.get_damage(600)
             self.hitted = False
         self.ready = False
         self.attack_time = pg.time.get_ticks()
