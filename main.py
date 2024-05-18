@@ -86,9 +86,9 @@ class Main():
             pg.draw.rect(self.screen, "red", (1205, 80, 590, 40))
             pg.draw.rect(self.screen, "green", (1205, 80, self.player2_sprite.hp, 40))
 
-            player_2 = self.font2.render(f'VS', False, (255, 255, 255))
-            player_2_rect = player_2.get_rect(center = (950, 120))
-            self.screen.blit(player_2, player_2_rect)
+            vs = self.font2.render(f'VS', False, (255, 255, 255))
+            vs_rect = vs.get_rect(center = (950, 120))
+            self.screen.blit(vs, vs_rect)
 
             # update
             self.particle_group.update()
@@ -113,6 +113,17 @@ class Main():
                 self.player2_sprite.hitted = True
             elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite.ready:
                 self.player1_sprite.hitted = True
+
+            # Win
+            if self.player1_sprite.lose:
+                win_message = self.font2.render(f'Player 2 Wins!', False, (255, 255, 255))
+                win_message_rect = win_message.get_rect(center = (950, 550))
+                self.screen.blit(win_message, win_message_rect)
+            if self.player2_sprite.lose:
+                win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
+                win_message_rect = win_message.get_rect(center = (950, 550))
+                self.screen.blit(win_message, win_message_rect)
+
 
             pg.display.update()
 

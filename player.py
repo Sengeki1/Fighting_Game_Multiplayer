@@ -28,12 +28,15 @@ class Player(pg.sprite.Sprite):
         # player status
         self.status = 'Idle'
         self.facing_right = True
+        self.lose = False
 
     def get_damage(self, amount):
         if self.hp <= 0:
             self.hp = 0
+            self.lose = True
         elif self.hp > 0:
             self.hp -= amount
+            self.lose = False
 
     def import_character_assets(self) -> None:
         character_path = f"Sprites/{self.character}/"
@@ -62,63 +65,64 @@ class Player(pg.sprite.Sprite):
             self.image = flipped_image
 
     def input(self) -> None:
-        key = pg.key.get_pressed()
-        if self.character == "Character 2":
-            if key[pg.K_SPACE] and self.rect.bottom == 980:
-                self.gravity = -20
-                self.direction.y = -16
+        if self.lose == False:
+            key = pg.key.get_pressed()
+            if self.character == "Character 1":
+                if key[pg.K_SPACE] and self.rect.bottom == 980:
+                    self.gravity = -20
+                    self.direction.y = -16
 
-                if not self.ready:
-                    self.gravity += 20
+                    if not self.ready:
+                        self.gravity += 20
 
-            if key[pg.K_RIGHT] and self.rect.right < 2000:
-                if self.ready:
-                    self.rect.x += 7
-                    self.new_rect.x += 7
-                    self.facing_right = True
-                    self.direction.x = 1
+                if key[pg.K_RIGHT] and self.rect.right < 2000:
+                    if self.ready:
+                        self.rect.x += 7
+                        self.new_rect.x += 7
+                        self.facing_right = True
+                        self.direction.x = 1
 
-                    if key[pg.K_LSHIFT]:
-                        self.rect.x += 4
-                        self.animation_speed = 0.20
+                        if key[pg.K_LSHIFT]:
+                            self.rect.x += 4
+                            self.animation_speed = 0.20
+                    else:
+                        self.rect.x += 3
+                        self.new_rect.x += 3
+                        self.facing_right = True
+                        self.direction.x = 1
+
+                    
+                elif key[pg.K_LEFT] and self.rect.left > -100:
+                    if self.ready:
+                        self.rect.x -= 7 
+                        self.new_rect.x -= 7
+                        self.facing_right = False
+                        self.direction.x = -1
+
+                        if key[pg.K_LSHIFT]:
+                            self.rect.x -= 4
+                            self.animation_speed = 0.20
+                    else:
+                        self.rect.x -= 3
+                        self.new_rect.x -= 3
+                        self.facing_right = False
+                        self.direction.x = -1
+                    
                 else:
-                    self.rect.x += 3
-                    self.new_rect.x += 3
-                    self.facing_right = True
-                    self.direction.x = 1
+                    self.rect.x += 0
+                    self.new_rect.x += 0
+                    self.direction.x = 0
 
-                
-            elif key[pg.K_LEFT] and self.rect.left > -100:
-                if self.ready:
-                    self.rect.x -= 7 
-                    self.new_rect.x -= 7
-                    self.facing_right = False
-                    self.direction.x = -1
-
-                    if key[pg.K_LSHIFT]:
-                        self.rect.x -= 4
-                        self.animation_speed = 0.20
-                else:
-                    self.rect.x -= 3
-                    self.new_rect.x -= 3
-                    self.facing_right = False
-                    self.direction.x = -1
-                
-            else:
-                self.rect.x += 0
-                self.new_rect.x += 0
-                self.direction.x = 0
-
-            if key[pg.K_q]:
-                self.q = 1
-                self.attack()
-            elif key[pg.K_e]:
-                self.e = 1
-                self.attack()
+                if key[pg.K_q]:
+                    self.q = 1
+                    self.attack()
+                elif key[pg.K_e]:
+                    self.e = 1
+                    self.attack()
     
     def attack(self):
         if self.hitted:
-            self.get_damage(20)
+            self.get_damage(15)
             self.hitted = False
         self.ready = False
         self.attack_time = pg.time.get_ticks()
