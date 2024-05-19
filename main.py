@@ -128,8 +128,8 @@ class Main():
 
                 # Hitboxes
                 self.check_hitbox()
-                pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
-                pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
+                #pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                #pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
 
                 # Collision
                 if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
