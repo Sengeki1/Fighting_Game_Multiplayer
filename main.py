@@ -1,8 +1,10 @@
 import pygame as pg
 from settings import *
-from player import Player
 from particles import Particle
 from support import *
+from player import Player
+import pickle
+from network import Network
 
 class Main():
     def __init__(self) -> None:
@@ -15,6 +17,10 @@ class Main():
         self.scoreB = 0
         self.secs = 500
         self.frame_index = 0
+
+        # Network
+        self.n = Network()
+        self.player_data = self.n.getP()
 
         # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
@@ -47,27 +53,28 @@ class Main():
         # Player
         self.player1 = pg.sprite.GroupSingle()
         self.player2 = pg.sprite.GroupSingle()
-        self.player1_sprite = Player((700, 834), "Character 1")
+        self.player1_sprite = Player((self.player_data['position'][0], self.player_data['position'][1]), self.player_data['character'])
         self.player1.add(self.player1_sprite)
-        self.player2_sprite = Player((1100, 854), "Character 2")
-        self.player2.add(self.player2_sprite)
 
     def check_hitbox(self):
-        if not self.player2_sprite.ready:
-            if self.player2_sprite.facing_right:
-                self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx + 20, self.player2_sprite.rect.y + 80, 150, 170)
+        if not self.player2_sprite['ready']:
+            if self.player2_sprite['facing_right']:
+                self.player2_hitbox = pg.Rect(self.player2_sprite['rect'][0] + 220, self.player2_sprite['rect'][1] + 80, 150, 170)
             else:
-                self.player2_hitbox = pg.Rect(self.player2_sprite.rect.centerx - 170, self.player2_sprite.rect.y + 80, 150, 170)
-            #pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
+                self.player2_hitbox = pg.Rect(self.player2_sprite['rect'][0], self.player2_sprite['rect'][1] + 80, 150, 170)
+            pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
         if not self.player1_sprite.ready:
             if self.player1_sprite.facing_right:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx + 40, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
             else:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.rect.centerx - 200, self.player1_sprite.rect.y + 130, self.player1_sprite.rect.width - 350, self.player1_sprite.rect.height - 130)
-            #pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
+            pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
 
     def run(self) -> None:
         while self.running:
+            self.player2_sprite = self.n.send(self.player1_sprite.get_data())
+            #print(self.player2_sprite)
+
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
@@ -94,7 +101,7 @@ class Main():
                 # display
                 self.screen.blit(self.background, (0, -300))
                 self.player1.draw(self.screen)
-                self.player2.draw(self.screen)
+                #self.player2_sprite['image'].draw(self.screen)
 
                 self.screen.blit(self.layer2, (0, 0))
                 self.screen.blit(self.layer1, (0, 0))
@@ -107,7 +114,7 @@ class Main():
                 self.screen.blit(player_1, player_1_rect)
                 pg.draw.rect(self.screen, "black", (100, 75, 600, 50))
                 pg.draw.rect(self.screen, "red", (105, 80, 590, 40))
-                pg.draw.rect(self.screen, "green", (105, 80, self.player1_sprite.hp, 40))
+                pg.draw.rect(self.screen, "green", (105, 80, self.player2_sprite['hp'], 40))
 
                 ## Player 2
                 player_2 = self.font.render(f'Player 2', False, (255, 255, 255))
@@ -115,7 +122,7 @@ class Main():
                 self.screen.blit(player_2, player_2_rect)
                 pg.draw.rect(self.screen, "black", (1200, 75, 600, 50))
                 pg.draw.rect(self.screen, "red", (1205, 80, 590, 40))
-                pg.draw.rect(self.screen, "green", (1205, 80, self.player2_sprite.hp, 40))
+                pg.draw.rect(self.screen, "green", (1205, 80, self.player1_sprite.hp, 40))
 
                 vs = self.font2.render(f'VS', False, (255, 255, 255))
                 vs_rect = vs.get_rect(center = (950, 120))
@@ -124,17 +131,16 @@ class Main():
                 # update
                 self.particle_group.update()
                 self.player1.update()
-                self.player2.update()
 
                 # Hitboxes
+                pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite['new_rect'])
                 self.check_hitbox()
-                #pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
-                #pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite.new_rect)
 
                 # Collision
-                if self.player1_hitbox.colliderect(self.player2_sprite.new_rect) and self.player1_sprite.ready:
-                    self.player2_sprite.hitted = True
-                elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite.ready:
+                if self.player1_hitbox.colliderect(self.player2_sprite['new_rect']) and self.player1_sprite.ready:
+                    self.player2_sprite['hitted'] = True
+                elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite['ready']:
                     self.player1_sprite.hitted = True
 
                 # Score
@@ -169,10 +175,10 @@ class Main():
                         self.secs -= 1
 
                         self.player1_sprite.hitted = False
-                        self.player2_sprite.hitted = False
+                        self.player2_sprite['hitted'] = False
                         self.player1_sprite.stop = True
-                        self.player2_sprite.stop = True
-                        self.player2_sprite.status = "Idle"
+                        self.player2_sprite['stop'] = True
+                        self.player2_sprite['status'] = "Idle"
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
@@ -181,15 +187,15 @@ class Main():
                         self.secs = 500
                         self.scoreB += 1
                         self.player1_sprite.rect.x = 450
-                        self.player2_sprite.rect.x = 950
+                        self.player2_sprite['rect'] = (950, self.player2_sprite['rect'][1])
                         self.init_timer = 100
                         self.player1_sprite.stop = False
-                        self.player2_sprite.stop = False
+                        self.player2_sprite['stop'] = False
                         self.player1_sprite.new_rect.x = 450 + 200
-                        self.player2_sprite.new_rect.x = 950 + 150
+                        self.player2_sprite['new_rect'] = (950 + 150, self.player2_sprite['new_rect'][0][1])
                         self.frame_index = 0
 
-                if self.player2_sprite.lose:
+                if self.player2_sprite['lose']:
                     win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
@@ -200,30 +206,30 @@ class Main():
                         self.frame_index = len(death_animation) - 1
 
                     image = death_animation[int(self.frame_index)]
-                    self.player2_sprite.image = image
+                    #self.player2_sprite.image = image
 
                     if self.secs >= 0 and self.scoreA < 2:
                         self.secs -= 1
 
                         self.player1_sprite.hitted = False
-                        self.player2_sprite.hitted = False
+                        self.player2_sprite['hitted']= False
                         self.player1_sprite.stop = True
-                        self.player2_sprite.stop = True
+                        self.player2_sprite['stop'] = True
                         self.player1_sprite.status = "Idle"
                         timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
                     else:
-                        self.player2_sprite.lose = False
+                        self.player2_sprite['lose'] = False
                         self.secs = 500
                         self.scoreA += 1
                         self.player1_sprite.rect.x = 450
-                        self.player2_sprite.rect.x = 950
+                        self.player2_sprite['rect'] = (950, self.player2_sprite['rect'][1])
                         self.init_timer = 100
                         self.player1_sprite.stop = False
-                        self.player2_sprite.stop = False
+                        self.player2_sprite['stop'] = False
                         self.player1_sprite.new_rect.x = 450 + 200
-                        self.player2_sprite.new_rect.x = 950 + 150
+                        self.player2_sprite['new_rect'] = (950 + 150, self.player2_sprite['new_rect'][0][1])
                         self.frame_index = 0
 
                 if self.scoreA == 3 or self.scoreB == 3:  
@@ -231,10 +237,10 @@ class Main():
                     self.scoreA = 0
                     self.scoreB = 0
                     self.player1_sprite.rect.x = 450
-                    self.player2_sprite.rect.x = 950
+                    self.player2_sprite['rect'] = (950, self.player2_sprite['rect'][1])
 
                     self.player1_sprite.get_health()
-                    self.player2_sprite.get_health()
+                    self.player2_sprite['hp'] = 590
 
                     self.check_hitbox()
 
@@ -246,7 +252,7 @@ class Main():
                     self.screen.blit(message, message_rect)
 
                     self.player1_sprite.get_health()
-                    self.player2_sprite.get_health()
+                    self.player2_sprite['hp'] = 590
 
                     self.check_hitbox()
                 
@@ -281,7 +287,7 @@ class Main():
                     self.screen.blit(self.restart_surf, self.restart_rect)
 
                     self.player1_sprite.get_health()
-                    self.player2_sprite.get_health()
+                    self.player2_sprite['hp'] = 590
 
                     self.check_hitbox()
 
