@@ -176,6 +176,7 @@ class Player(pg.sprite.Sprite):
             current_time = pg.time.get_ticks()
             if current_time - self.attack_time >= self.attack_cooldown:
                 self.ready = True
+                self.hitted = False
     
     def get_data(self):
         return {

@@ -14,7 +14,7 @@ class Main():
         self.game_active = False
         self.scoreA = 0
         self.scoreB = 0
-        self.secs = 500
+        self.secs = 100
         self.frame_index = 0
 
         # Network
@@ -136,11 +136,11 @@ class Main():
                 pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite['new_rect'])
                 self.check_hitbox()
 
-                # Collision
+                # Collision ### Fixed
                 if self.player1_hitbox.colliderect(self.player2_sprite['new_rect']) and self.player1_sprite.ready:
-                    self.player2_sprite['hitted'] = True
-                elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite['ready']:
                     self.player1_sprite.hitted = True
+                elif self.player2_hitbox.colliderect(self.player1_sprite.new_rect) and self.player2_sprite['ready']:
+                    self.player2_sprite['hitted'] = True
 
                 # Score ### Fixed
                 if self.scoreA < 3 and self.scoreA > 0:
@@ -155,14 +155,14 @@ class Main():
                     elif self.scoreB == 2:
                         pg.draw.rect(self.screen, (255, 255, 0), (1220, 130, 25, 25), 0, 25)
                         pg.draw.rect(self.screen, (255, 255, 0), (1270, 130, 25, 25), 0, 25)
-
-                # Win
-                if self.player1_sprite.lose:
+                
+                # Win ### Fixed
+                if self.player2_sprite['lose']:
                     win_message = self.font2.render(f'Player 2 Wins!', False, (255, 255, 255))
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
 
-                    death_animation = import_folder('Sprites/Character 1/Death', 'Character 1')
+                    death_animation = import_folder(f'Sprites/{self.player1_sprite.character}/Death', self.player1_sprite.character)
                     self.frame_index += 0.18
                     if self.frame_index >= len(death_animation):
                         self.frame_index = len(death_animation) - 1
@@ -170,7 +170,7 @@ class Main():
                     image = death_animation[int(self.frame_index)]
                     self.player1_sprite.image = image
                     
-                    if self.secs >= 0 and self.scoreB < 2:
+                    if self.secs >= 0 and self.scoreA < 2:
                         self.secs -= 1
 
                         self.player1_sprite.hitted = False
@@ -183,7 +183,8 @@ class Main():
                         self.screen.blit(timer_message, timer_message_rect)
                     else:
                         self.player1_sprite.lose = False
-                        self.secs = 500
+                        self.player2_sprite['lose'] = False
+                        self.secs = 100
                         self.scoreB += 1
                         self.player1_sprite.rect.x = 450
                         self.player2_sprite['rect'].x = 950
@@ -194,20 +195,12 @@ class Main():
                         self.player2_sprite['new_rect'].x = 950 + 150
                         self.frame_index = 0
 
-                if self.player2_sprite['lose']:
+                if self.player1_sprite.lose:
                     win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
                     
-                    death_animation = import_folder('Sprites/Character 2/Death', 'Character 2')
-                    self.frame_index += 0.18
-                    if self.frame_index >= len(death_animation):
-                        self.frame_index = len(death_animation) - 1
-
-                    image = death_animation[int(self.frame_index)]
-                    #self.player2_sprite.image = image
-
-                    if self.secs >= 0 and self.scoreA < 2:
+                    if self.secs >= 0 and self.scoreB < 2:
                         self.secs -= 1
 
                         self.player1_sprite.hitted = False
@@ -219,8 +212,9 @@ class Main():
                         timer_message_rect = timer_message.get_rect(center = (950, 650))
                         self.screen.blit(timer_message, timer_message_rect)
                     else:
+                        self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
-                        self.secs = 500
+                        self.secs = 100
                         self.scoreA += 1
                         self.player1_sprite.rect.x = 450
                         self.player2_sprite['rect'].x = 950

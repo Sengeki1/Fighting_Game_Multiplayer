@@ -21,6 +21,7 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a connection, Server Started")
 
+clients = []
 players = [Player((700, 834), "Character 1"), Player((1100, 854), "Character 2")]
 
 def threaded_client(conn, player): # given the player
@@ -58,7 +59,11 @@ while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
 
+    clients.append(conn)
     start_new_thread(threaded_client,(conn, currentPlayer))
     currentPlayer += 1
+
+for client in clients:
+    client.send(pickle.dumps({'message': 'START'}))
 
 
