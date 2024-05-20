@@ -170,7 +170,7 @@ class Main():
                     image = death_animation[int(self.frame_index)]
                     self.player1_sprite.image = image
                     
-                    if self.player2_sprite['secs'] >= 0 and self.scoreA < 2:
+                    if self.player2_sprite['secs'] >= 0 and self.scoreB < 2:
                         self.player2_sprite['secs'] -= 1
 
                         self.player1_sprite.hitted = False
@@ -181,7 +181,7 @@ class Main():
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
-                        self.player2_sprite['secs'] = 100
+                        self.player2_sprite['secs'] = 500
                         self.scoreB += 1
                         self.player1_sprite.rect.x = 450
                         self.player2_sprite['rect'].x = 950
@@ -196,7 +196,7 @@ class Main():
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
                     
-                    if self.player1_sprite.secs >= 0 and self.scoreB < 2:
+                    if self.player1_sprite.secs >= 0 and self.scoreA < 2:
                         self.player1_sprite.secs -= 1
 
                         self.player1_sprite.hitted = False
@@ -207,7 +207,7 @@ class Main():
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
-                        self.player1_sprite.secs = 100
+                        self.player1_sprite.secs = 500
                         self.scoreA += 1
                         self.player1_sprite.rect.x = 950
                         self.player2_sprite['rect'].x = 450
@@ -221,8 +221,9 @@ class Main():
                     self.game_active = False
                     self.scoreA = 0
                     self.scoreB = 0
-                    self.player1_sprite.rect.x = 450
-                    self.player2_sprite['rect'].x = 950
+                    self.player1_sprite.rect.x = 950
+                    self.player2_sprite['rect'].x = 450
+                    self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 40
 
                     self.player1_sprite.get_health()
                     self.player2_sprite['hp'] = 590
