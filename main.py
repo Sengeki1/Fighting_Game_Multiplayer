@@ -131,7 +131,7 @@ class Main():
                 vs_rect = vs.get_rect(center = (950, 120))
                 self.screen.blit(vs, vs_rect)
 
-                # Hitboxes
+                # Hitboxes ### Fixed
                 pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
                 pg.draw.rect(self.screen, (255, 0, 0), self.player2_sprite['new_rect'])
                 self.check_hitbox()
@@ -181,7 +181,7 @@ class Main():
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
-                        self.secs = 100
+                        self.player2_sprite['secs'] = 100
                         self.scoreB += 1
                         self.player1_sprite.rect.x = 450
                         self.player2_sprite['rect'].x = 950
@@ -207,7 +207,7 @@ class Main():
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
-                        self.secs = 100
+                        self.player1_sprite.secs = 100
                         self.scoreA += 1
                         self.player1_sprite.rect.x = 950
                         self.player2_sprite['rect'].x = 450
