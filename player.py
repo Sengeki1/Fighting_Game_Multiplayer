@@ -1,14 +1,16 @@
 import pygame as pg
+import numpy
 from support import import_folder
 
 class Player(pg.sprite.Sprite):
     def __init__(self, pos, character) -> None:
         super().__init__()
         self.character = character
+        self.posx, self.posy = pos
         self.import_character_assets()
         self.frame_index = 0
         self.animation_speed = 0.19
-        self.image = self.animations['Idle'][self.frame_index] 
+        self.image = self.animations['Idle'][self.frame_index]
         self.rect = self.image.get_rect(center=pos)
         self.new_rect = pg.Rect(pos[0] - 20, pos[1], 80, 125)
         self.stop = False
@@ -79,7 +81,7 @@ class Player(pg.sprite.Sprite):
                     if not self.ready:
                         self.gravity += 20
 
-                if key[pg.K_RIGHT] and self.rect.right < 2000:
+                if key[pg.K_d] and self.rect.right < 2000:
                     if self.ready:
                         self.rect.x += 7
                         self.new_rect.x += 7
@@ -97,7 +99,7 @@ class Player(pg.sprite.Sprite):
                         self.direction.x = 1
 
                     
-                elif key[pg.K_LEFT] and self.rect.left > -100:
+                elif key[pg.K_a] and self.rect.left > -100:
                     if self.ready:
                         self.rect.x -= 7 
                         self.new_rect.x -= 7
@@ -174,6 +176,36 @@ class Player(pg.sprite.Sprite):
             current_time = pg.time.get_ticks()
             if current_time - self.attack_time >= self.attack_cooldown:
                 self.ready = True
+    
+    def get_data(self):
+        return {
+            'position': (self.posx, self.posy),
+            'rect': self.rect,
+            'hp': self.hp,
+            'status': self.status,
+            'facing_right': self.facing_right,
+            'ready': self.ready,
+            'lose': self.lose,
+            'hitted': self.hitted,
+            'new_rect': self.new_rect,
+            'character': self.character,
+            'frame_index': self.frame_index,
+            'stop': self.stop,
+        }
+    
+    def update_data(self, data):
+        self.facing_right = data['facing_right']
+        self.status = data['status']
+        self.rect.x, self.rect.y = data['position']
+        self.rect = data['rect']
+        self.new_rect = data['new_rect']
+        self.hp = data['hp']
+        self.ready = data['ready']
+        self.stop = data['stop']
+        self.lose = data['lose']
+        self.hitted = data['hitted']
+        self.frame_index = data['frame_index']
+        self.character = data['character']
 
     def update(self) -> None:
         self.apply_gravity()
