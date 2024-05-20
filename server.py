@@ -30,7 +30,7 @@ def threaded_client(conn, player): # given the player
     while True:
         try:
             # Receive and deserialize data from the client
-            data = pickle.loads(conn.recv(2048))
+            data = pickle.loads(conn.recv(1024))
             players[player].update_data(data) # Update the player's data
             if not data:
                 print("Disconnected")

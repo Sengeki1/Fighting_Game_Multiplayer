@@ -14,13 +14,13 @@ class Network:
     def connect(self):
         try:
             self.client.connect(self.addr) # Connect to Server
-            return pickle.loads(self.client.recv(2048)) # get Player Position and Color
+            return pickle.loads(self.client.recv(1024)) # get Player Position and Color
         except:
             pass
 
     def send(self, data):
         try:
             self.client.send(pickle.dumps(data))
-            return pickle.loads(self.client.recv(2048))
+            return pickle.loads(self.client.recv(1024))
         except socket.error as e:
             print(e)

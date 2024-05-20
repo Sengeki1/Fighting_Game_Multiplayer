@@ -14,7 +14,7 @@ class Main():
         self.game_active = False
         self.scoreA = 0
         self.scoreB = 0
-        self.secs = 100
+        self.secs = 500
         self.frame_index = 0
 
         # Network
@@ -170,17 +170,14 @@ class Main():
                     image = death_animation[int(self.frame_index)]
                     self.player1_sprite.image = image
                     
-                    if self.secs >= 0 and self.scoreA < 2:
-                        self.secs -= 1
+                    if self.player2_sprite['secs'] >= 0 and self.scoreA < 2:
+                        self.player2_sprite['secs'] -= 1
 
                         self.player1_sprite.hitted = False
                         self.player2_sprite['hitted'] = False
                         self.player1_sprite.stop = True
                         self.player2_sprite['stop'] = True
                         self.player2_sprite['status'] = "Idle"
-                        timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
-                        timer_message_rect = timer_message.get_rect(center = (950, 650))
-                        self.screen.blit(timer_message, timer_message_rect)
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
@@ -191,8 +188,7 @@ class Main():
                         self.init_timer = 100
                         self.player1_sprite.stop = False
                         self.player2_sprite['stop'] = False
-                        self.player1_sprite.new_rect.x = 450 + 200
-                        self.player2_sprite['new_rect'].x = 950 + 150
+                        self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                         self.frame_index = 0
 
                 if self.player1_sprite.lose:
@@ -200,29 +196,25 @@ class Main():
                     win_message_rect = win_message.get_rect(center = (950, 550))
                     self.screen.blit(win_message, win_message_rect)
                     
-                    if self.secs >= 0 and self.scoreB < 2:
-                        self.secs -= 1
+                    if self.player1_sprite.secs >= 0 and self.scoreB < 2:
+                        self.player1_sprite.secs -= 1
 
                         self.player1_sprite.hitted = False
                         self.player2_sprite['hitted']= False
                         self.player1_sprite.stop = True
                         self.player2_sprite['stop'] = True
                         self.player1_sprite.status = "Idle"
-                        timer_message = self.font2.render(f'{int(self.secs / 100)}', False, (255, 255, 255))
-                        timer_message_rect = timer_message.get_rect(center = (950, 650))
-                        self.screen.blit(timer_message, timer_message_rect)
                     else:
                         self.player1_sprite.lose = False
                         self.player2_sprite['lose'] = False
                         self.secs = 100
                         self.scoreA += 1
-                        self.player1_sprite.rect.x = 450
-                        self.player2_sprite['rect'].x = 950
+                        self.player1_sprite.rect.x = 950
+                        self.player2_sprite['rect'].x = 450
                         self.init_timer = 100
                         self.player1_sprite.stop = False
                         self.player2_sprite['stop'] = False
-                        self.player1_sprite.new_rect.x = 450 + 200
-                        self.player2_sprite['new_rect'].x = 950 + 150
+                        self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 40
                         self.frame_index = 0
 
                 if self.scoreA == 3 or self.scoreB == 3:  
@@ -235,8 +227,6 @@ class Main():
                     self.player1_sprite.get_health()
                     self.player2_sprite['hp'] = 590
 
-                    self.check_hitbox()
-
                 if self.init_timer >= 0:
                     self.init_timer -= 1
 
@@ -246,8 +236,6 @@ class Main():
 
                     self.player1_sprite.get_health()
                     self.player2_sprite['hp'] = 590
-
-                    self.check_hitbox()
                 
             else:
                 if self.init_message:
@@ -281,8 +269,6 @@ class Main():
 
                     self.player1_sprite.get_health()
                     self.player2_sprite['hp'] = 590
-
-                    self.check_hitbox()
 
             pg.display.update()
 
