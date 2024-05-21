@@ -9,7 +9,7 @@ import threading
 pg.init()
 pg.display.set_mode((800, 600))  # Adjust the size as needed
 
-server = "192.168.1.65"
+server = "192.168.5.179"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,7 +23,7 @@ s.listen(2)
 print("Waiting for a connection, Server Started")
 
 clients = []
-players = [Player((700, 834), "Character 1"), Player((1100, 854), "Character 2")]
+players = [Player((700, 854), "Character 1"), Player((1100, 854), "Character 2")]
 
 # Condition variable to synchronize clients
 condition = threading.Condition()
@@ -41,11 +41,12 @@ def threaded_client(conn, player):
         else:
             condition.notify_all()  # Notify the waiting client
 
+    print({"player_data": players[player].get_data(), "message": "START"})
     conn.send(pickle.dumps({"player_data": players[player].get_data(), "message": "START"}))
 
     while True:
         try:
-            data = pickle.loads(conn.recv(4096))  # Increase buffer size to 4096
+            data = pickle.loads(conn.recv(1024))  # Increase buffer size to 4096
             players[player].update_data(data)  # Update the player's data
 
             if not data:
