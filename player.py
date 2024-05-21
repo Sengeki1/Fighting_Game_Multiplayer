@@ -14,7 +14,6 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.new_rect = pg.Rect(pos[0] - 20, pos[1], 80, 125)
         self.stop = False
-        self.secs = 500
 
         # player movement
         self.gravity = 0
@@ -50,7 +49,7 @@ class Player(pg.sprite.Sprite):
         self.animations = {
             'Attack1': [], 'Attack2': [], 
             'Death': [], 'Fall': [], 'Idle': [], 
-            'Jump': [], 'Run': [], 'Take Hit': []
+            'Jump': [], 'Run': []
         }
 
         for animation in self.animations.keys():
@@ -182,8 +181,8 @@ class Player(pg.sprite.Sprite):
     def get_data(self):
         return {
             'position': (self.posx, self.posy),
-            'rect': self.rect,
             'hp': self.hp,
+            'rect': self.rect,
             'status': self.status,
             'facing_right': self.facing_right,
             'ready': self.ready,
@@ -193,7 +192,8 @@ class Player(pg.sprite.Sprite):
             'character': self.character,
             'frame_index': self.frame_index,
             'stop': self.stop,
-            'secs': self.secs
+            'direction': self.direction,
+            'gravity': self.gravity
         }
     
     def update_data(self, data):
@@ -209,7 +209,8 @@ class Player(pg.sprite.Sprite):
         self.hitted = data['hitted']
         self.frame_index = data['frame_index']
         self.character = data['character']
-        self.secs = data['secs']
+        self.direction = data['direction']
+        self.gravity = data['gravity']
 
     def update(self) -> None:
         self.apply_gravity()
