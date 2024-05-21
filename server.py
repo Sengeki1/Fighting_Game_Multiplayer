@@ -9,7 +9,7 @@ import threading
 pg.init()
 pg.display.set_mode((800, 600))  # Adjust the size as needed
 
-server = "192.168.5.179"
+server = "192.168.1.68"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
