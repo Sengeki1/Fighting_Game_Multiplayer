@@ -22,10 +22,6 @@ class Player2(pg.sprite.Sprite):
         self.gravity = 0
         self.direction = pg.math.Vector2(0, 0)
         self.ready = True
-        self.attack_time = 0
-        self.attack_cooldown = 600
-        self.q = 0
-        self.e = 0
 
         # Health Bar
         self.hp = 590
@@ -33,11 +29,8 @@ class Player2(pg.sprite.Sprite):
 
         # player status
         self.status = 'Idle'
-        self.facing_right = True
+        self.facing_right = False
         self.lose = False
-
-    # def get_health(self):
-    #     self.hp = 590
 
     def import_character_assets(self) -> None:
         character_path = f"Sprites/{self.character}/"
@@ -50,6 +43,25 @@ class Player2(pg.sprite.Sprite):
         for animation in self.animations.keys():
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path, self.character)
+    
+    def get_status(self) -> None:
+        if not self.ready:
+            if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
+                if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
+                    self.ready = True
+                    self.hitted = False
+
+        else:
+            if self.stop == False:
+                if self.direction.y < 0:
+                    self.status = "Jump"
+                elif self.direction.y > 0:
+                    self.status = "Fall"
+                else:
+                    if self.direction.x != 0:
+                        self.status = "Run"
+                    else:
+                        self.status = "Idle"
     
     def animation(self) -> None:
         animation = self.animations[self.status]
@@ -64,40 +76,9 @@ class Player2(pg.sprite.Sprite):
         else:
             flipped_image = pg.transform.flip(image, True, False)
             self.image = flipped_image
-    
-    # def apply_gravity(self) -> None:
-    #     self.gravity += 0.8
-    #     self.rect.y += self.gravity 
-    #     self.new_rect.y += self.gravity
-    #     self.direction.y += 0.8
-        
-    #     if self.rect.bottom >= 980:
-    #         self.rect.bottom = 980
-    #         self.new_rect.bottom = 980
-    #         self.direction.y = 0
-
-    # def get_status(self) -> None:
-    #     if not self.ready:
-    #         if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
-    #             if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
-    #                 self.ready = True
-    #                 self.hitted = False
-
-    #     else:
-    #         if self.stop == False:
-    #             if self.direction.y < 0:
-    #                 self.status = "Jump"
-    #             elif self.direction.y > 0:
-    #                 self.status = "Fall"
-    #             else:
-    #                 if self.direction.x != 0:
-    #                     self.status = "Run"
-    #                 else:
-    #                     self.status = "Idle"
 
     def update(self) -> None:
-        # self.apply_gravity()
-        # self.get_status()
+        self.get_status()
         self.animation()
 
 class Main():
@@ -161,13 +142,13 @@ class Main():
                 self.player2_hitbox = pg.Rect(self.player2_sprite['new_rect'].centerx + 20, self.player2_sprite['new_rect'].y - 30, 150, 170)
             else:
                 self.player2_hitbox = pg.Rect(self.player2_sprite['new_rect'].centerx - 170, self.player2_sprite['new_rect'].y - 30, 150, 170)
-            pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
+           # pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
         if not self.player1_sprite.ready:
             if self.player1_sprite.facing_right:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx + 20, self.player1_sprite.new_rect.y - 30, 150, 170)
             else:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx - 170, self.player1_sprite.new_rect.y - 30, 150, 170)
-            pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
+           # pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
 
     def run(self) -> None:
         if self.message == "START":
@@ -189,6 +170,8 @@ class Main():
                 self.player2.direction.y = self.player2_sprite['direction'][1]
                 self.player2.facing_right = self.player2_sprite['facing_right']
                 self.player2.gravity = self.player2_sprite['gravity']
+                self.player2.frame_index = self.player2_sprite['frame_index']
+                self.player2.hitted = self.player2_sprite['hitted']
 
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
@@ -319,13 +302,13 @@ class Main():
                         win_message_rect = win_message.get_rect(center = (950, 550))
                         self.screen.blit(win_message, win_message_rect)
 
-                        death_animation = import_folder(f'Sprites/{self.player2_sprite.character}/Death', self.player1_sprite.character)
+                        death_animation = import_folder(f'Sprites/{self.player2.character}/Death', self.player2.character)
                         self.frame_index += 0.18
                         if self.frame_index >= len(death_animation):
                             self.frame_index = len(death_animation) - 1
 
                         image = death_animation[int(self.frame_index)]
-                        self.player1_sprite.image = image
+                        self.player2.image = image
                         
                         # Calculate the elapsed time
                         milliseconds_passed = pg.time.get_ticks() - start_ticks
