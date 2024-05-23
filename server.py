@@ -4,12 +4,14 @@ import pickle
 import pygame as pg
 from player import Player
 import threading
+import time
+import psutil  # Import psutil for setting CPU affinity
 
 # Initialize Pygame
 pg.init()
 pg.display.set_mode((800, 600))  # Adjust the size as needed
 
-server = "192.168.1.68"
+server = "192.168.1.69"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,10 +27,47 @@ print("Waiting for a connection, Server Started")
 clients = []
 players = [Player((700, 854), "Character 1"), Player((1100, 854), "Character 2")]
 
-# Condition variable to synchronize clients
+# Condition variable to synchronize clients and timer
 condition = threading.Condition()
 connected_clients = 0
 currentPlayer = 0
+
+# Timer flag and thread
+timer_thread = None
+timer_running = False
+
+def countdown_timer(duration):
+    global timer_running
+    try:
+        while duration > 0:
+            with condition:
+                if not timer_running:
+                    break
+                for conn in clients:
+                    try:
+                        conn.sendall(pickle.dumps({"start_timer": duration}))
+                    except Exception as e:
+                        print(f"Error sending timer: {e}")
+            duration -= 1
+            time.sleep(0.02)
+        # Notify clients that the timer has ended
+        with condition:
+            if timer_running:
+                for conn in clients:
+                    try:
+                        conn.sendall(pickle.dumps({"start_timer": 0, "lose": False}))
+                    except Exception as e:
+                        print(f"Error sending timer end notification: {e}")
+    finally:
+        timer_running = False
+
+def start_timer(duration):
+    global timer_thread, timer_running
+    with condition:
+        if not timer_running:
+            timer_running = True
+            timer_thread = threading.Thread(target=countdown_timer, args=(duration,))
+            timer_thread.start()
 
 def threaded_client(conn, player):
     global connected_clients
@@ -41,27 +80,29 @@ def threaded_client(conn, player):
         else:
             condition.notify_all()  # Notify the waiting client
 
-    print({"player_data": players[player].get_data(), "message": "START"})
     conn.send(pickle.dumps({"player_data": players[player].get_data(), "message": "START"}))
 
     while True:
         try:
-            data = pickle.loads(conn.recv(1024))  # Increase buffer size to 4096
-            players[player].update_data(data)  # Update the player's data
+            data = pickle.loads(conn.recv(1024))  # Increased buffer size
+            if "timer" in data:
+                start_timer(100)
 
-            if not data:
-                print("Disconnected")
-                break
-            else:
-                if player == 1:
-                    reply = players[0].get_data()  # Send player 0's data to player 1
+            if "timer" not in data:
+                players[player].update_data(data)  # Update the player's data
+
+                if not data:
+                    print("Disconnected")
+                    break
                 else:
-                    reply = players[1].get_data()  # Send player 1's data to player 0
+                    if player == 1:
+                        reply = players[0].get_data()  # Send player 0's data to player 1
+                    else:
+                        reply = players[1].get_data()  # Send player 1's data to player 0
 
-                print(f"Player {player} received: {data}")
-                print(f"Player {player} sending: {reply}")
+                    print(reply)
 
-            conn.sendall(pickle.dumps(reply))
+                    conn.sendall(pickle.dumps(reply))             
         except Exception as e:
             print(f"Error during communication with player {player}: {e}")
             break
@@ -70,6 +111,7 @@ def threaded_client(conn, player):
     conn.close()
     with condition:
         connected_clients -= 1
+        clients.remove(conn)
         if currentPlayer > 0:
             currentPlayer -= 1
         else:
