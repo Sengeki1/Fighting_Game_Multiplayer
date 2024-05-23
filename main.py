@@ -103,11 +103,6 @@ class Main():
         music.set_volume(0.2)
         music.play(loops = -1)
 
-        self.slash1 = pg.mixer.Sound('Sound/1/1.wav')
-        self.slash1.set_volume(0.2)
-        self.slash2 = pg.mixer.Sound('Sound/1/2.wav')
-        self.slash2.set_volume(0.2)
-
         # Network
         self.n = Network()
         self.player_data = self.n.getP()
@@ -157,14 +152,12 @@ class Main():
                 self.player2_hitbox = pg.Rect(self.player2.new_rect.centerx + 20, self.player2.new_rect.y - 30, 150, 170)
             else:
                 self.player2_hitbox = pg.Rect(self.player2.new_rect.centerx - 170, self.player2.new_rect.y - 30, 150, 170)
-            #self.slash1.play()
             #pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
         if not self.player1_sprite.ready:
             if self.player1_sprite.facing_right:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx + 20, self.player1_sprite.new_rect.y - 30, 150, 170)
             else:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx - 170, self.player1_sprite.new_rect.y - 30, 150, 170)
-            #self.slash2.play()
             #pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
 
     def run(self) -> None:
