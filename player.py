@@ -1,5 +1,4 @@
 import pygame as pg
-import numpy
 from support import import_folder
 
 class Player(pg.sprite.Sprite):
@@ -13,7 +12,6 @@ class Player(pg.sprite.Sprite):
         self.image = self.animations['Idle'][self.frame_index]
         self.rect = self.image.get_rect(center=pos)
         self.new_rect = pg.Rect(pos[0] - 20, pos[1], 80, 125)
-        self.stop = False
 
         # player movement
         self.gravity = 0
@@ -73,60 +71,59 @@ class Player(pg.sprite.Sprite):
     def input(self) -> None:
         if self.lose == False:
             key = pg.key.get_pressed()
-            if self.stop == False:
-                if key[pg.K_SPACE] and self.rect.bottom == 980:
-                    self.gravity = -20
-                    self.direction.y = -16
+            if key[pg.K_SPACE] and self.rect.bottom == 980:
+                self.gravity = -20
+                self.direction.y = -16
 
-                    if not self.ready:
-                        self.gravity += 20
+                if not self.ready:
+                    self.gravity += 20
 
-                if key[pg.K_d] and self.rect.right < 2000:
-                    if self.ready:
-                        self.rect.x += 7
-                        self.new_rect.x += 7
-                        self.facing_right = True
-                        self.direction.x = 1
+            if key[pg.K_d] and self.rect.right < 2000:
+                if self.ready:
+                    self.rect.x += 7
+                    self.new_rect.x += 7
+                    self.facing_right = True
+                    self.direction.x = 1
 
-                        if key[pg.K_LSHIFT]:
-                            self.rect.x += 4
-                            self.new_rect.x += 4
-                            self.animation_speed = 0.20
-                    else:
-                        self.rect.x += 3
-                        self.new_rect.x += 3
-                        self.facing_right = True
-                        self.direction.x = 1
-
-                    
-                elif key[pg.K_a] and self.rect.left > -100:
-                    if self.ready:
-                        self.rect.x -= 7 
-                        self.new_rect.x -= 7
-                        self.facing_right = False
-                        self.direction.x = -1
-
-                        if key[pg.K_LSHIFT]:
-                            self.rect.x -= 4
-                            self.new_rect.x -= 4
-                            self.animation_speed = 0.20
-                    else:
-                        self.rect.x -= 3
-                        self.new_rect.x -= 3
-                        self.facing_right = False
-                        self.direction.x = -1
-                    
+                    if key[pg.K_LSHIFT]:
+                        self.rect.x += 4
+                        self.new_rect.x += 4
+                        self.animation_speed = 0.20
                 else:
-                    self.rect.x += 0
-                    self.new_rect.x += 0
-                    self.direction.x = 0
+                    self.rect.x += 3
+                    self.new_rect.x += 3
+                    self.facing_right = True
+                    self.direction.x = 1
 
-                if key[pg.K_q]:
-                    self.q = 1
-                    self.attack()
-                elif key[pg.K_e]:
-                    self.e = 1
-                    self.attack()
+                
+            elif key[pg.K_a] and self.rect.left > -100:
+                if self.ready:
+                    self.rect.x -= 7 
+                    self.new_rect.x -= 7
+                    self.facing_right = False
+                    self.direction.x = -1
+
+                    if key[pg.K_LSHIFT]:
+                        self.rect.x -= 4
+                        self.new_rect.x -= 4
+                        self.animation_speed = 0.20
+                else:
+                    self.rect.x -= 3
+                    self.new_rect.x -= 3
+                    self.facing_right = False
+                    self.direction.x = -1
+                
+            else:
+                self.rect.x += 0
+                self.new_rect.x += 0
+                self.direction.x = 0
+
+            if key[pg.K_q]:
+                self.q = 1
+                self.attack()
+            elif key[pg.K_e]:
+                self.e = 1
+                self.attack()
     
     def attack(self):
         if self.hitted:
@@ -160,7 +157,7 @@ class Player(pg.sprite.Sprite):
                     self.hitted = False
 
         else:
-            if self.stop == False:
+            if self.lose == False:
                 if self.direction.y < 0:
                     self.status = "Jump"
                 elif self.direction.y > 0:
@@ -191,9 +188,8 @@ class Player(pg.sprite.Sprite):
             'new_rect': self.new_rect,
             'character': self.character,
             'frame_index': self.frame_index,
-            'stop': self.stop,
             'direction': self.direction,
-            'gravity': self.gravity
+            'gravity': self.gravity,
         }
     
     def update_data(self, data):
@@ -204,7 +200,6 @@ class Player(pg.sprite.Sprite):
         self.new_rect = data['new_rect']
         self.hp = data['hp']
         self.ready = data['ready']
-        self.stop = data['stop']
         self.lose = data['lose']
         self.hitted = data['hitted']
         self.frame_index = data['frame_index']
