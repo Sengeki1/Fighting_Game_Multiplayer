@@ -98,6 +98,11 @@ class Main():
         self.frame_index = 0
         self.data = 0
 
+        # Audio
+        music = pg.mixer.Sound('Sound/MysticalForest1.wav')
+        music.set_volume(0.2)
+        music.play(loops = -1)
+
         # Network
         self.n = Network()
         self.player_data = self.n.getP()

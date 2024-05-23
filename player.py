@@ -31,6 +31,11 @@ class Player(pg.sprite.Sprite):
         self.facing_right = True
         self.lose = False
 
+        self.slash1 = pg.mixer.Sound('Sound/1/1.wav')
+        self.slash1.set_volume(0.2)
+        self.slash2 = pg.mixer.Sound('Sound/1/2.wav')
+        self.slash2.set_volume(0.2)
+
     def get_damage(self, amount):
         if self.hp <= 0:
             self.hp = 0
@@ -120,9 +125,11 @@ class Player(pg.sprite.Sprite):
 
             if key[pg.K_q]:
                 self.q = 1
+                #self.slash1.play()
                 self.attack()
             elif key[pg.K_e]:
                 self.e = 1
+                #self.slash2.play()
                 self.attack()
     
     def attack(self):
