@@ -18,9 +18,7 @@ class Player(pg.sprite.Sprite):
         self.direction = pg.math.Vector2(0, 0)
         self.ready = True
         self.attack_time = 0
-        self.attack_cooldown = 600
-        self.q = 0
-        self.e = 0
+        self.attack_cooldown = 1500
 
         # Health Bar
         self.hp = 590
@@ -31,9 +29,9 @@ class Player(pg.sprite.Sprite):
         self.facing_right = True
         self.lose = False
 
-        self.slash1 = pg.mixer.Sound('Sound/1/1.wav')
+        self.slash1 = pg.mixer.Sound('Sound/1/1.mp3')
         self.slash1.set_volume(0.2)
-        self.slash2 = pg.mixer.Sound('Sound/1/2.wav')
+        self.slash2 = pg.mixer.Sound('Sound/1/2.mp3')
         self.slash2.set_volume(0.2)
 
     def get_damage(self, amount):
@@ -65,6 +63,10 @@ class Player(pg.sprite.Sprite):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
+
+            if self.status == 'Attack1' or self.status == 'Attack2':
+                self.status = 'Idle'
+                self.ready = True
         
         image = animation[int(self.frame_index)]
         if self.facing_right:
@@ -123,27 +125,25 @@ class Player(pg.sprite.Sprite):
                 self.new_rect.x += 0
                 self.direction.x = 0
 
-            if key[pg.K_q]:
-                self.q = 1
-                #self.slash1.play()
-                self.attack()
-            elif key[pg.K_e]:
-                self.e = 1
-                #self.slash2.play()
-                self.attack()
-    
-    def attack(self):
-        if self.hitted:
-            self.hitted = False
-            self.get_damage(15)
-        self.ready = False
-        self.attack_time = pg.time.get_ticks()
-        if self.q == 1:
-            self.status = 'Attack1'
-            self.q = 0
-        elif self.e == 1:
-            self.status = 'Attack2'
-            self.e = 0
+            if key[pg.K_q] and self.ready:
+                self.status = 'Attack1'
+                self.slash1.play()
+                self.ready = False
+                self.attack_time = pg.time.get_ticks()
+
+                if self.hitted:
+                    self.hitted = False
+                    self.get_damage(15)
+            else:
+                if key[pg.K_e] and self.ready:
+                    self.status = 'Attack2'
+                    self.slash2.play()
+                    self.ready = False
+                    self.attack_time = pg.time.get_ticks()
+
+                    if self.hitted:
+                        self.hitted = False
+                        self.get_damage(15)
 
     def apply_gravity(self) -> None:
         self.gravity += 0.8
@@ -157,13 +157,7 @@ class Player(pg.sprite.Sprite):
             self.direction.y = 0
         
     def get_status(self) -> None:
-        if not self.ready:
-            if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
-                if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
-                    self.ready = True
-                    self.hitted = False
-
-        else:
+        if self.ready:
             if self.lose == False:
                 if self.direction.y < 0:
                     self.status = "Jump"
@@ -218,5 +212,5 @@ class Player(pg.sprite.Sprite):
         self.apply_gravity()
         self.input()
         self.get_status()
-        self.animation()
         self.recharge()
+        self.animation()
