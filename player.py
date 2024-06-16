@@ -19,6 +19,7 @@ class Player(pg.sprite.Sprite):
         self.ready = True
         self.attack_time = 0
         self.attack_cooldown = 1500
+        self.stop = False
 
         # Health Bar
         self.hp = 590
@@ -78,52 +79,53 @@ class Player(pg.sprite.Sprite):
     def input(self) -> None:
         if self.lose == False:
             key = pg.key.get_pressed()
-            if key[pg.K_SPACE] and self.rect.bottom == 980:
-                self.gravity = -20
-                self.direction.y = -16
+            if self.stop == False:
+                if key[pg.K_SPACE] and self.rect.bottom == 980:
+                    self.gravity = -20
+                    self.direction.y = -16
 
-                if not self.ready:
-                    self.gravity += 20
+                    if not self.ready:
+                        self.gravity += 20
 
-            if key[pg.K_d] and self.rect.right < 2000:
-                if self.ready:
-                    self.rect.x += 7
-                    self.new_rect.x += 7
-                    self.facing_right = True
-                    self.direction.x = 1
+                if key[pg.K_d] and self.rect.right < 2000:
+                    if self.ready:
+                        self.rect.x += 7
+                        self.new_rect.x += 7
+                        self.facing_right = True
+                        self.direction.x = 1
 
-                    if key[pg.K_LSHIFT]:
-                        self.rect.x += 4
-                        self.new_rect.x += 4
-                        self.animation_speed = 0.20
+                        if key[pg.K_LSHIFT]:
+                            self.rect.x += 4
+                            self.new_rect.x += 4
+                            self.animation_speed = 0.20
+                    else:
+                        self.rect.x += 3
+                        self.new_rect.x += 3
+                        self.facing_right = True
+                        self.direction.x = 1
+
+                    
+                elif key[pg.K_a] and self.rect.left > -100:
+                    if self.ready:
+                        self.rect.x -= 7 
+                        self.new_rect.x -= 7
+                        self.facing_right = False
+                        self.direction.x = -1
+
+                        if key[pg.K_LSHIFT]:
+                            self.rect.x -= 4
+                            self.new_rect.x -= 4
+                            self.animation_speed = 0.20
+                    else:
+                        self.rect.x -= 3
+                        self.new_rect.x -= 3
+                        self.facing_right = False
+                        self.direction.x = -1
+                    
                 else:
-                    self.rect.x += 3
-                    self.new_rect.x += 3
-                    self.facing_right = True
-                    self.direction.x = 1
-
-                
-            elif key[pg.K_a] and self.rect.left > -100:
-                if self.ready:
-                    self.rect.x -= 7 
-                    self.new_rect.x -= 7
-                    self.facing_right = False
-                    self.direction.x = -1
-
-                    if key[pg.K_LSHIFT]:
-                        self.rect.x -= 4
-                        self.new_rect.x -= 4
-                        self.animation_speed = 0.20
-                else:
-                    self.rect.x -= 3
-                    self.new_rect.x -= 3
-                    self.facing_right = False
-                    self.direction.x = -1
-                
-            else:
-                self.rect.x += 0
-                self.new_rect.x += 0
-                self.direction.x = 0
+                    self.rect.x += 0
+                    self.new_rect.x += 0
+                    self.direction.x = 0
 
             if key[pg.K_q] and self.ready:
                 self.status = 'Attack1'
@@ -133,7 +135,7 @@ class Player(pg.sprite.Sprite):
 
                 if self.hitted:
                     self.hitted = False
-                    self.get_damage(15)
+                    self.get_damage(40)
             else:
                 if key[pg.K_e] and self.ready:
                     self.status = 'Attack2'
@@ -143,7 +145,7 @@ class Player(pg.sprite.Sprite):
 
                     if self.hitted:
                         self.hitted = False
-                        self.get_damage(15)
+                        self.get_damage(40)
 
     def apply_gravity(self) -> None:
         self.gravity += 0.8

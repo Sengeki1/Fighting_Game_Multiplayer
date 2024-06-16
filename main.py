@@ -49,13 +49,7 @@ class Player2(pg.sprite.Sprite):
             self.animations[animation] = import_folder(full_path, self.character)
     
     def get_status(self) -> None:
-        if not self.ready:
-            if self.status != 'Attack1' or self.frame_index >= len(self.animations['Attack1']) - 1:
-                if self.status != 'Attack2' or self.frame_index >= len(self.animations['Attack2']) - 1:
-                    self.ready = True
-                    self.hitted = False
-
-        else:
+        if self.ready:
             if self.lose == False:
                 if self.direction.y < 0:
                     self.status = "Jump"
@@ -73,6 +67,10 @@ class Player2(pg.sprite.Sprite):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
+
+            if self.status == 'Attack1' or self.status == 'Attack2':
+                self.status = 'Idle'
+                self.ready = True
         
         image = animation[int(self.frame_index)]
         if self.facing_right:
@@ -291,6 +289,7 @@ class Main():
                                 self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                                 self.frame_index = 0
                                 self.player2.lose = False
+                                self.player1_sprite.stop = self.data["stopMoving"]
                             else:
                                 self.timer_text = self.font.render(f'Time left: {timer / 10}', False, (255, 255, 255))
                                 timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
@@ -299,6 +298,7 @@ class Main():
                                 self.player2.hitted = False
                                 self.player1_sprite.hitted = False
                                 self.player2.status = "Idle"
+                                self.player1_sprite.stop = self.data["stopMoving"]
 
                     elif self.player1_sprite.lose:
                         self.data = self.n.send({"timer": True})
