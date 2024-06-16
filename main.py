@@ -152,13 +152,13 @@ class Main():
                 self.player2_hitbox = pg.Rect(self.player2.new_rect.centerx + 20, self.player2.new_rect.y - 30, 150, 170)
             else:
                 self.player2_hitbox = pg.Rect(self.player2.new_rect.centerx - 170, self.player2.new_rect.y - 30, 150, 170)
-            #pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
+            # pg.draw.rect(self.screen, (0, 255, 0), self.player2_hitbox)
         if not self.player1_sprite.ready:
             if self.player1_sprite.facing_right:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx + 20, self.player1_sprite.new_rect.y - 30, 150, 170)
             else:
                 self.player1_hitbox = pg.Rect(self.player1_sprite.new_rect.centerx - 170, self.player1_sprite.new_rect.y - 30, 150, 170)
-            #pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
+            # pg.draw.rect(self.screen, (0, 255, 0), self.player1_hitbox)
 
     def run(self) -> None:
         if self.message == "START":
@@ -239,8 +239,8 @@ class Main():
                     self.screen.blit(vs, vs_rect)
 
                     # Hitboxes ### Fixed
-                    #pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
-                    #pg.draw.rect(self.screen, (255, 0, 0), self.player2.new_rect)
+                    # pg.draw.rect(self.screen, (255, 0, 0), self.player1_sprite.new_rect)
+                    # pg.draw.rect(self.screen, (255, 0, 0), self.player2.new_rect)
                     self.check_hitbox()
 
                     # Collision ### Fixed
@@ -251,7 +251,6 @@ class Main():
 
                     # Score ### Fixed
                     if self.scoreA < 3 and self.scoreA > 0:
-                        ### SCORE MUST BE A LIST OF 3 ELEMENT TRUE OR FALSE AND SET IT INSIDE THE LOSE LOGIC WHEN A PLAYER WINS
                         if self.scoreA == 1:
                             pg.draw.rect(self.screen, (255, 255, 0), (130, 130, 25, 25), 0, 25)
                         else:
@@ -266,7 +265,7 @@ class Main():
                                 pg.draw.rect(self.screen, (255, 255, 0), (1220, 130, 25, 25), 0, 25)
                                 pg.draw.rect(self.screen, (255, 255, 0), (1270, 130, 25, 25), 0, 25)
                     
-                    # Win ### FIXED
+                    # Win ### NOT FIXED
                     if self.player2.lose:
                         self.data = self.n.send({"timer": True})
 
@@ -291,7 +290,7 @@ class Main():
                                 self.player2.rect.x = self.init_player2_stats['position'][0]
                                 self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                                 self.frame_index = 0
-                                self.player2.lose = self.data["lose"]
+                                self.player2.lose = False
                             else:
                                 self.timer_text = self.font.render(f'Time left: {timer / 10}', False, (255, 255, 255))
                                 timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
@@ -325,7 +324,7 @@ class Main():
                                 self.player2.rect.x = self.init_player2_stats['position'][0]
                                 self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                                 self.frame_index = 0
-                                self.player1_sprite.lose = self.data["lose"]
+                                self.player1_sprite.lose = False
                             else:
                                 self.timer_text = self.font.render(f'Time left: {timer / 10}', False, (255, 255, 255))
                                 timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
