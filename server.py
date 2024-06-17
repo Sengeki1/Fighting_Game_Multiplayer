@@ -5,23 +5,24 @@ import pygame as pg
 from player import Player
 import threading
 import time
-import psutil  # Import psutil for setting CPU affinity
 
 # Initialize Pygame
 pg.init()
-pg.display.set_mode((800, 600))  # Adjust the size as needed
+pg.display.set_mode((800, 600))
 
 server = "192.168.1.66"
-port = 5555
+tcp_port = 5555
+udp_port = 5556
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# TCP socket for connection
+tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_socket.bind((server, tcp_port))
+tcp_socket.listen(2)
 
-try:
-    s.bind((server, port))
-except socket.error as e:
-    print(str(e))
+# UDP socket for data
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_socket.bind((server, udp_port))
 
-s.listen(2)
 print("Waiting for a connection, Server Started")
 
 clients = []
@@ -43,21 +44,21 @@ def countdown_timer(duration):
             with condition:
                 if not timer_running:
                     break
-                for conn in clients:
+                for addr in clients:
                     try:
-                        conn.sendall(pickle.dumps({"start_timer": duration, "stopMoving": True}))
+                        udp_socket.sendto(pickle.dumps({"start_timer": duration, "stopMoving": True}), addr)
                     except Exception as e:
                         print(f"Error sending timer: {e}")
             duration -= 1
-            time.sleep(0.02)
+            time.sleep(1)  # Changed to 1 second for a real countdown
         # Notify clients that the timer has ended
         with condition:
             if timer_running:
-                for conn in clients:
+                for addr in clients:
                     try:
-                        conn.sendall(pickle.dumps({"start_timer": 0, "stopMoving": False}))
+                        udp_socket.sendto(pickle.dumps({"start_timer": 0, "stopMoving": False}), addr)
                     except Exception as e:
-                        print(f"Error sendingd timer end notification: {e}")
+                        print(f"Error sending timer end notification: {e}")
     finally:
         timer_running = False
 
@@ -69,7 +70,7 @@ def start_timer(duration):
             timer_thread = threading.Thread(target=countdown_timer, args=(duration,))
             timer_thread.start()
 
-def threaded_client(conn, player):
+def threaded_client(conn, address, player):
     global connected_clients
     global currentPlayer
     with condition:
@@ -84,7 +85,8 @@ def threaded_client(conn, player):
 
     while True:
         try:
-            data = pickle.loads(conn.recv(1024))  # Increased buffer size
+            data, addr = udp_socket.recvfrom(1024)
+            data = pickle.loads(data)
             if "timer" in data:
                 start_timer(100)
 
@@ -101,17 +103,15 @@ def threaded_client(conn, player):
                         reply = players[1].get_data()  # Send player 1's data to player 0
 
                     print(reply)
-
-                    conn.sendall(pickle.dumps(reply))             
+                    udp_socket.sendto(pickle.dumps(reply), addr)
         except Exception as e:
             print(f"Error during communication with player {player}: {e}")
             break
 
     print(f"Player {player} lost connection")
-    conn.close()
     with condition:
         connected_clients -= 1
-        clients.remove(conn)
+        clients.remove(addr)
         if currentPlayer > 0:
             currentPlayer -= 1
         else:
@@ -119,9 +119,10 @@ def threaded_client(conn, player):
 
 print("[STARTING] server is starting...")
 while True:
-    conn, addr = s.accept()
+    conn, addr = tcp_socket.accept()
     print("Connected to:", addr)
 
-    clients.append(conn)
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    if addr not in clients:
+        clients.append(addr)
+        start_new_thread(threaded_client, (conn, addr, currentPlayer))
+        currentPlayer += 1

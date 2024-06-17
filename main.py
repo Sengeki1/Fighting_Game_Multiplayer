@@ -94,7 +94,7 @@ class Main():
         self.scoreB = 0
         self.countdown_time = 15
         self.frame_index = 0
-        self.data = 0
+        self.data = {}
 
         # Audio
         music = pg.mixer.Sound('Sound/MysticalForest1.wav')
@@ -140,7 +140,7 @@ class Main():
         self.player1_sprite = Player((self.player_data['player_data']['position'][0], self.player_data['player_data']['position'][1]), self.player_data['player_data']['character'])
         self.player1.add(self.player1_sprite)
         
-        self.init_player2_stats = self.n.send(self.player1_sprite.get_data())
+        self.init_player2_stats = self.n.sendUDP(self.player1_sprite.get_data())
         self.player2 = Player2((self.init_player2_stats['position'][0], self.init_player2_stats['position'][1]), self.init_player2_stats['character'])
         self.p2.add(self.player2)
 
@@ -165,7 +165,7 @@ class Main():
                 self.current_ticks = pg.time.get_ticks()
                 self.clock.tick(60)
 
-                self.player2_sprite = self.n.send(self.player1_sprite.get_data())
+                self.player2_sprite = self.n.sendUDP(self.player1_sprite.get_data())
                 
                 if "start_timer" not in self.player2_sprite:
                     self.player2.rect.centerx = self.player2_sprite['new_rect'].centerx
@@ -281,7 +281,7 @@ class Main():
 
                         if "start_timer" in self.data:
                             timer = self.data["start_timer"]
-                            if timer <= 0:
+                            if timer <= 0.5:
                                 self.scoreB += 1
                                 self.init_timer = 100
                                 self.player1_sprite.rect.x = self.player_data['player_data']['position'][0] - 300
@@ -289,7 +289,6 @@ class Main():
                                 self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                                 self.frame_index = 0
                                 self.player2.lose = False
-                                self.player1_sprite.stop = self.data["stopMoving"]
                             else:
                                 self.timer_text = self.font.render(f'Time left: {timer / 10}', False, (255, 255, 255))
                                 timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
@@ -298,7 +297,6 @@ class Main():
                                 self.player2.hitted = False
                                 self.player1_sprite.hitted = False
                                 self.player2.status = "Idle"
-                                self.player1_sprite.stop = self.data["stopMoving"]
 
                     elif self.player1_sprite.lose:
                         self.data = self.n.send({"timer": True})
@@ -317,7 +315,7 @@ class Main():
                         
                         if "start_timer" in self.data:
                             timer = self.data["start_timer"]
-                            if timer <= 0:
+                            if timer <= 0.5:
                                 self.scoreA += 1
                                 self.init_timer = 100
                                 self.player1_sprite.rect.x = self.player_data['player_data']['position'][0] - 300
