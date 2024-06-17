@@ -5,13 +5,12 @@ import pygame as pg
 from player import Player
 import threading
 import time
-import psutil  # Import psutil for setting CPU affinity
 
 # Initialize Pygame
 pg.init()
 pg.display.set_mode((800, 600))  # Adjust the size as needed
 
-server = "192.168.1.66"
+server = "192.168.5.179"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

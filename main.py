@@ -289,7 +289,7 @@ class Main():
                                 self.player1_sprite.new_rect.x = self.player1_sprite.rect.centerx - 30
                                 self.frame_index = 0
                                 self.player2.lose = False
-                                self.player1_sprite.stop = self.data["stopMoving"]
+                                self.player1_sprite.stop = self.data['stopMoving']
                             else:
                                 self.timer_text = self.font.render(f'Time left: {timer / 10}', False, (255, 255, 255))
                                 timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
@@ -298,9 +298,9 @@ class Main():
                                 self.player2.hitted = False
                                 self.player1_sprite.hitted = False
                                 self.player2.status = "Idle"
-                                self.player1_sprite.stop = self.data["stopMoving"]
+                                self.player1_sprite.stop = self.data['stopMoving']
 
-                    elif self.player1_sprite.lose:
+                    elif self.player1_sprite.lose and self.player2.lose == False:
                         self.data = self.n.send({"timer": True})
 
                         win_message = self.font2.render(f'Player 1 Wins!', False, (255, 255, 255))
