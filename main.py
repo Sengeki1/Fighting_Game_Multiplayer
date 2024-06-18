@@ -115,6 +115,7 @@ class Main():
 
         # Font
         self.ratio = 1
+        self.normal_font = pg.font.Font('Font/Pixeltype.ttf', 40)
         self.font = pg.font.Font('Font/Pixeltype.ttf', 90)
         self.font2 = pg.font.Font('Font/Pixeltype.ttf', 160)
         self.font3 = pg.font.Font('Font/Pixeltype.ttf', 400)
@@ -233,12 +234,25 @@ class Main():
             
             ####### LOGIN & REGISTER ###############
             if self.authenticated == False:
+                self.screen.fill((0, 0, 0))
                 pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 200, (SCREEN_HEIGHT / 2) - 300, 400, 600))
-                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 50, 300, 50))
-                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 45, 290, 40))
+                
+                # User
+                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 50))
+                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40))
+                self.username = self.normal_font.render(f'Username', False, (255, 0, 0))
+                self.username_rect = self.username.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 130))
+                self.screen.blit(self.username, self.username_rect)
+                
+                # Password
+                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 50, 300, 50))
+                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40))
+                self.password = self.normal_font.render(f'Password', False, (255, 0, 0))
+                self.password_rect = self.password.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 20))
+                self.screen.blit(self.password, self.password_rect)
                 
                 ##### condition if only user is register into the DataBase
-                self.authenticated = True
+                #self.authenticated = True
                 
                 if self.authenticated and self.logged == 0:
                     self.screen.fill((0, 0, 0))
