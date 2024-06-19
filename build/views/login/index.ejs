@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="/css/login.css" rel="stylesheet"/>
+    <script src="https://kit.fontawesome.com/4e4c23d5e2.js" crossorigin="anonymous"></script>
+    <title>Sign Up Page</title>
+  </head>
+  <body>
+    <section class="overlay">
+      <div class="header">
+        <h1>Sign In</h1>
+        <p>Login an account:</p>
+      </div>
+      <form id="login" action="/login" method="POST">
+        <br>
+        <label for="username"></label>
+        <i class="fa-solid fa-envelope"></i>
+        <input id="username" name="username" type="username" placeholder="Username">
+        <br>
+        <label for="password"></label>
+        <i class="fa-solid fa-lock"></i>
+        <input id="password" name="password" type="password" placeholder="Password">
+        <br>
+        <br>
+        <input class='button' type="submit" value="Login">
+      </form> 
+      <div class="sign-up">
+        <p>
+          Don't have an account? <a href="/singupUser" >Sign up</a>
+        </p>
+      </div>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="/css/register.css" rel="stylesheet">
+        <title>Register</title>
+        <script src="https://kit.fontawesome.com/4e4c23d5e2.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <section class="overlay">
+            <div class="header">
+                <h1>Sign Up</h1>
+                <p>Register an account:</p>
+            </div>
+            <br>
+            <form id="register" action="/singup" method="POST">
+                <div id="input-field">
+                    <label for="name"></label>
+                    <i class="fa-solid fa-user"></i>
+                    <input id="name" name="name" type="text" placeholder="Name">
+                </div>
+                <div id="input-field">
+                    <label for="username"></label>
+                    <i class="fa-solid fa-user"></i>
+                    <input id="username" name="username" type="text" placeholder="Username">
+                </div>
+                <div id="input-field">
+                    <label for="email"></label>
+                    <i class="fa-solid fa-envelope"></i>
+                    <input id="email" name="email" type="email" placeholder="Email">
+                </div>
+                <div id="input-field">
+                    <label for="password"></label>
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="password" name="password" type="password" placeholder="Password">
+                </div>
+                <div id="input-field">
+                    <label for="confirm-pw"></label>
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="confirm-pw" name="confirm-pw" type="password" placeholder="Confirm Password">
+                </div>
+                <section class="gender">
+                    <span>gender: </span>
+                    <input id="m" name="sex" type="radio" value="yes">
+                    <label for="sex">M</label>
+                    <input id="f" name="sex" type="radio" value="yes">
+                    <label for="sex">F</label>
+                </section>
+                <div class="button">
+                    <label for="click"></label>
+                    <input id="click" name="click" type="submit" value="Register">
+                </div>
+            </form>
+            <div class="sign-in">
+                <p>
+                    Already have an account? <a href="/loginUser">Sign In</a>
+                </p>
+            </div>
+        </section>
+    </body>
+</html>

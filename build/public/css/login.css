@@ -1,0 +1,82 @@
+.overlay {
+    text-align: center;
+    background-color: white;
+    font-family: Arial;
+    color: black;
+    font-size: 17px;
+    border: 3px solid white;
+    border-radius: 15px;
+    padding: 50px 10px;
+    width: 300px;
+    margin: auto;
+    margin-top: 5%;
+    position: relative;
+    top: 140px;
+    line-height: 25px;
+    box-shadow: 25px 25px 30px rgba(0,0,0,0.15);
+}
+
+.header h1 {
+    font-weight: bold;
+    font-size: 23px;
+    color: black;
+}
+
+body {
+    background-image: 
+    url('https://coolbackgrounds.io/images/backgrounds/index/compute-ea4c57a4.png');
+}
+
+.button {
+    border: 3px black; 
+    border-radius: 40px; 
+    background-color: black; 
+    padding: 10px 40px;
+    font-size: 16px;
+    color: whitesmoke;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: lightskyblue;
+    color: black;
+    border: 3px lightskyblue;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 10px 40px;
+    transition: 300ms ease-in-out;
+}
+
+#password {
+    border: 0.5px solid black;
+    border-radius: 0px 5px 5px 0px;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 80%;
+    margin-top: 30px;
+}
+
+#username {
+    border: 0.5px solid black;
+    border-radius: 0px 5px 5px 0px;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 80%;
+}
+
+.sign-up {
+    font-size: 15px;
+    position: relative;
+    right: 5px;
+}
+
+.sign-up p a {
+    color: blue;
+}
+
+#icon2 {
+    position: absolute;
+    top: 41.6%;
+    right: 8%;
+}
