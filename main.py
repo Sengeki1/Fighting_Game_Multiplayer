@@ -98,6 +98,10 @@ class Main():
         self.authenticated = False
         self.message = ""
         self.logged = 0
+        self.text1 = ''
+        self.text2 = ''
+        self.clicked1 = False
+        self.clicked2 = False
 
         # Audio
         music = pg.mixer.Sound('Sound/MysticalForest1.wav')
@@ -224,6 +228,35 @@ class Main():
                 elif event.type == pg.KEYDOWN or event.type == pg.KEYUP:
                     if event.key == pg.K_ESCAPE:
                         self.running = False
+                elif (event.type == pg.MOUSEBUTTONUP):
+                    mouse_position = pg.mouse.get_pos()             # Location of the mouse-click
+                    if self.click_Rect_1.collidepoint(mouse_position):
+                        self.clicked1 = True
+                    else:
+                        self.clicked1 = False
+                    if self.click_Rect_2.collidepoint(mouse_position):
+                        self.clicked2 = True
+                    else:
+                        self.clicked2 = False
+                
+                if self.clicked1 or self.clicked2:
+                    if event.type == pg.KEYDOWN:
+                        if event.key == pg.K_RETURN:
+                            self.dataText = self.n.send({"authentication": True, "username": self.text1, "password": self.text2})
+                            self.text1 = ''
+                            self.text2 = ''
+                            self.clicked1 = False
+                            self.clicked2 = False
+                        elif event.key == pg.K_BACKSPACE:
+                            if self.clicked1:
+                                self.text1 = self.text1[:-1]
+                            if self.clicked2:
+                                self.text2 = self.text2[:-1]
+                        else:
+                            if len(self.text1) < 18 and self.clicked1:
+                                self.text1 += event.unicode
+                            if len(self.text2) < 18 and self.clicked2:
+                                self.text2 += event.unicode
 
                 if self.game_active == False:
                     if event.type == pg.KEYDOWN:
@@ -239,17 +272,23 @@ class Main():
                 
                 # User
                 pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 50))
-                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40))
+                self.click_Rect_1 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40))
                 self.username = self.normal_font.render(f'Username', False, (255, 0, 0))
                 self.username_rect = self.username.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 130))
                 self.screen.blit(self.username, self.username_rect)
                 
                 # Password
                 pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 50, 300, 50))
-                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40))
+                self.click_Rect_2 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40))
                 self.password = self.normal_font.render(f'Password', False, (255, 0, 0))
                 self.password_rect = self.password.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 20))
                 self.screen.blit(self.password, self.password_rect)
+
+                txt_surface = self.normal_font.render(self.text1, True, (0, 255, 0))
+                self.screen.blit(txt_surface, self.click_Rect_1)
+
+                txt_surface_2 = self.normal_font.render(self.text2, True, (0, 255, 0))
+                self.screen.blit(txt_surface_2, self.click_Rect_2)
                 
                 ##### condition if only user is register into the DataBase
                 #self.authenticated = True
