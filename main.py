@@ -4,6 +4,7 @@ from particles import Particle
 from support import *
 from player import Player
 from settings import *
+from databaseConn import DatabaseConn
 from network import Network
 
 class Player2(pg.sprite.Sprite):
@@ -111,6 +112,7 @@ class Main():
         # Network
         self.n = None
         self.player_data = None
+        self.databaseServer = DatabaseConn()
 
         # Hitboxes
         self.hitbox = pg.Rect(0, 0, 0, 0)
@@ -242,11 +244,15 @@ class Main():
                 if self.clicked1 or self.clicked2:
                     if event.type == pg.KEYDOWN:
                         if event.key == pg.K_RETURN:
-                            self.dataText = self.n.send({"authentication": True, "username": self.text1, "password": self.text2})
+                            package = self.databaseServer.send({"username": self.text1, "password": self.text2})
                             self.text1 = ''
                             self.text2 = ''
                             self.clicked1 = False
                             self.clicked2 = False
+
+                            if "authentication" in package:
+                                self.authenticated = package["authentication"]
+                                
                         elif event.key == pg.K_BACKSPACE:
                             if self.clicked1:
                                 self.text1 = self.text1[:-1]
@@ -263,20 +269,66 @@ class Main():
                         if event.key == pg.K_RETURN:
                             self.game_active = True
                             self.init_timer = 100
-                            self.init_message = False
-            
+
             ####### LOGIN & REGISTER ###############
+            if self.authenticated:
+                self.screen.fill((0, 0, 0))
+
+                self.databaseServer.send({"stop": True})
+
+                self.n = Network()
+
+                self.player_data = self.n.getP()
+                self.message = self.player_data['message']
+
+                self.player1_sprite = Player(
+                    (self.player_data['player_data']['position'][0], self.player_data['player_data']['position'][1]),
+                    self.player_data['player_data']['character'])
+                self.player1.add(self.player1_sprite)
+
+                self.init_player2_stats = self.n.send(self.player1_sprite.get_data())
+                self.player2 = Player2((self.init_player2_stats['position'][0], self.init_player2_stats['position'][1]),
+                                       self.init_player2_stats['character'])
+                self.p2.add(self.player2)
+
+                self.message = self.font.render(f'Press <Enter> to start!', False, (255, 255, 255))
+                self.message_rect = self.message.get_rect(center = (960, 300))
+                self.screen.blit(self.message, self.message_rect)
+
+                self.keybinds = self.font.render(f'Keybinds:', False, (255, 255, 255))
+                self.keybinds_rect = self.keybinds.get_rect(center = (960, 450))
+                self.screen.blit(self.keybinds, self.keybinds_rect)
+
+                self.key_tutorial1 = self.font.render(f'Press <Q> to perform Attack 1!', False, (255, 255, 255))
+                self.key_tutorial1_rect = self.key_tutorial1.get_rect(center = (960, 550))
+                self.screen.blit(self.key_tutorial1, self.key_tutorial1_rect)
+
+                self.key_tutorial2 = self.font.render(f'Press <E> to perform Attack 2!', False, (255, 255, 255))
+                self.key_tutorial2_rect = self.key_tutorial2.get_rect(center = (960, 650))
+                self.screen.blit(self.key_tutorial2, self.key_tutorial2_rect)
+
+                self.key_tutorial3= self.font.render(f'Press <LSHIFT> to perform a Dash!', False, (255, 255, 255))
+                self.key_tutorial3_rect = self.key_tutorial3.get_rect(center = (960, 750))
+                self.screen.blit(self.key_tutorial3, self.key_tutorial3_rect)
+
+                self.final_message= self.font.render(f'Enjoy<3', False, (255, 255, 255))
+                self.final_message_rect = self.final_message.get_rect(center = (960, 1000))
+                self.screen.blit(self.final_message, self.final_message_rect)
+
+                if self.message == "START":
+                    self.logged = 1
+
             if self.authenticated == False:
                 self.screen.fill((0, 0, 0))
                 pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 200, (SCREEN_HEIGHT / 2) - 300, 400, 600))
-                
+
                 # User
                 pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 50))
                 self.click_Rect_1 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40))
                 self.username = self.normal_font.render(f'Username', False, (255, 0, 0))
                 self.username_rect = self.username.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 130))
                 self.screen.blit(self.username, self.username_rect)
-                
+
                 # Password
                 pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 50, 300, 50))
                 self.click_Rect_2 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40))
@@ -289,29 +341,8 @@ class Main():
 
                 txt_surface_2 = self.normal_font.render(self.text2, True, (0, 255, 0))
                 self.screen.blit(txt_surface_2, self.click_Rect_2)
-                
-                ##### condition if only user is register into the DataBase
-                #self.authenticated = True
-                
-                if self.authenticated and self.logged == 0:
-                    self.screen.fill((0, 0, 0))
 
-                    self.n = Network()
-
-                    self.player_data = self.n.getP()
-                    self.message = self.player_data['message']
-
-                    self.player1_sprite = Player((self.player_data['player_data']['position'][0], self.player_data['player_data']['position'][1]), self.player_data['player_data']['character'])
-                    self.player1.add(self.player1_sprite)
-                    
-                    self.init_player2_stats = self.n.send(self.player1_sprite.get_data())
-                    self.player2 = Player2((self.init_player2_stats['position'][0], self.init_player2_stats['position'][1]), self.init_player2_stats['character'])
-                    self.p2.add(self.player2)
-
-                    if self.message == "START":
-                        self.logged = 1
-
-            if self.game_active and self.authenticated:
+            if self.game_active and self.logged == 1:
 
                 self.clock.tick(60)
 
@@ -426,32 +457,6 @@ class Main():
 
                     self.player1_sprite.get_health()
                     self.player2.get_health()
-                
-            elif self.game_active == False and self.authenticated: 
-                if self.init_message:
-                    self.message = self.font.render(f'Press <Enter> to start!', False, (255, 255, 255))
-                    self.message_rect = self.message.get_rect(center = (960, 300))
-                    self.screen.blit(self.message, self.message_rect)
-
-                    self.keybinds = self.font.render(f'Keybinds:', False, (255, 255, 255))
-                    self.keybinds_rect = self.keybinds.get_rect(center = (960, 450))
-                    self.screen.blit(self.keybinds, self.keybinds_rect)
-
-                    self.key_tutorial1 = self.font.render(f'Press <Q> to perform Attack 1!', False, (255, 255, 255))
-                    self.key_tutorial1_rect = self.key_tutorial1.get_rect(center = (960, 550))
-                    self.screen.blit(self.key_tutorial1, self.key_tutorial1_rect)
-
-                    self.key_tutorial2 = self.font.render(f'Press <E> to perform Attack 2!', False, (255, 255, 255))
-                    self.key_tutorial2_rect = self.key_tutorial2.get_rect(center = (960, 650))
-                    self.screen.blit(self.key_tutorial2, self.key_tutorial2_rect)
-
-                    self.key_tutorial3= self.font.render(f'Press <LSHIFT> to perform a Dash!', False, (255, 255, 255))
-                    self.key_tutorial3_rect = self.key_tutorial3.get_rect(center = (960, 750))
-                    self.screen.blit(self.key_tutorial3, self.key_tutorial3_rect)
-
-                    self.final_message= self.font.render(f'Enjoy<3', False, (255, 255, 255))
-                    self.final_message_rect = self.final_message.get_rect(center = (960, 1000))
-                    self.screen.blit(self.final_message, self.final_message_rect)
 
                 else:
                     self.screen.fill((0, 0, 0))
