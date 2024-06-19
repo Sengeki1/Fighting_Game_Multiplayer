@@ -44,7 +44,7 @@ def countdown_timer(duration):
                     break
                 for conn in clients:
                     try:
-                        conn.sendall(pickle.dumps({"start_timer": duration, "stopMoving": True}))
+                        conn.sendall(pickle.dumps({"start_timer": duration}))
                     except Exception as e:
                         print(f"Error sending timer: {e}")
             duration -= 1
@@ -54,9 +54,9 @@ def countdown_timer(duration):
             if timer_running:
                 for conn in clients:
                     try:
-                        conn.sendall(pickle.dumps({"start_timer": 0, "stopMoving": False}))
+                        conn.sendall(pickle.dumps({"start_timer": 0}))
                     except Exception as e:
-                        print(f"Error sendingd timer end notification: {e}")
+                        print(f"Error sending timer end notification: {e}")
     finally:
         timer_running = False
 

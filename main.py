@@ -6,7 +6,6 @@ from player import Player
 from settings import *
 from databaseConn import DatabaseConn
 from network import Network
-import time
 
 class Player2(pg.sprite.Sprite):
     def __init__(self, pos, character) -> None:
@@ -175,8 +174,11 @@ class Main():
 
     def handle_win_condition(self):
         if self.player2.lose or self.player1_sprite.lose:
+            self.data = self.n.send({"timer": True})
+
             winning_player = "Player 1" if self.player2.lose else "Player 2"
             losing_player_sprite = self.player1_sprite if self.player2.lose else self.player2
+
             win_message = self.font2.render(f'{winning_player} Wins!', False, (255, 255, 255))
             win_message_rect = win_message.get_rect(center=(950, 550))
             self.screen.blit(win_message, win_message_rect)
@@ -189,7 +191,6 @@ class Main():
             image = death_animation[int(self.frame_index)]
             losing_player_sprite.image = image
 
-            self.data = self.n.send({"timer": True})
             if "start_timer" in self.data:
                 timer = self.data["start_timer"]
                 if timer <= 0:
@@ -207,9 +208,6 @@ class Main():
                     timer_rect = self.timer_text.get_rect(center=(SCREEN_WIDTH // 2, 50))
                     self.screen.blit(self.timer_text, timer_rect)
                     self.reset_hitted_status()
-            else:
-                # Handle potential error or missing data
-                print("Error: Timer data not received.")
 
     def check_hitbox(self): ### fixed show hitbox
         if not self.player2.ready:
@@ -272,9 +270,7 @@ class Main():
                         if event.key == pg.K_RETURN:
                             self.game_active = True
                             self.init_timer = 100
-                            self.init_message = False
 
-            ####### LOGIN & REGISTER ###############
             if self.authenticated and self.logged == 0:
                 self.screen.fill((0, 0, 0))
 
@@ -305,7 +301,6 @@ class Main():
                 self.databaseServer.send({"stop": True})
 
                 self.duration -= 1
-                print(self.duration)
                 if self.duration <= 0:
                     self.n = Network()
 
@@ -324,7 +319,6 @@ class Main():
                         self.init_player2_stats['character']
                     )
                     self.p2.add(self.player2)
-                    print("connected")
 
                     self.logged = 1
 
@@ -456,7 +450,7 @@ class Main():
                     
                     self.player1_sprite.lose = False
                     self.player2.lose = False
-                    self.init_timer = 100
+                    self.init_timer = 0
                     self.frame_index = 0
 
                     self.scoreA = 0
@@ -474,13 +468,14 @@ class Main():
                     self.player1_sprite.get_health()
                     self.player2.get_health()
 
-            elif self.game_active == False and self.authenticated and self.logged == 2:
-                self.restart = True
-                self.screen.fill((0, 0, 0))
-                self.screen.blit(self.restart_surf, self.restart_rect)
+            else:
+                if self.game_active == False and self.authenticated and self.logged == 2:
+                    self.restart = True
+                    self.screen.fill((0, 0, 0))
+                    self.screen.blit(self.restart_surf, self.restart_rect)
 
-                self.player1_sprite.get_health()
-                self.player2.get_health()
+                    self.player1_sprite.get_health()
+                    self.player2.get_health()
 
             pg.display.update()
 
