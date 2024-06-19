@@ -135,7 +135,7 @@ class Player(pg.sprite.Sprite):
 
                 if self.hitted:
                     self.hitted = False
-                    self.get_damage(40)
+                    self.get_damage(150)
             else:
                 if key[pg.K_e] and self.ready:
                     self.status = 'Attack2'
@@ -145,7 +145,7 @@ class Player(pg.sprite.Sprite):
 
                     if self.hitted:
                         self.hitted = False
-                        self.get_damage(40)
+                        self.get_damage(150)
 
     def apply_gravity(self) -> None:
         self.gravity += 0.8
