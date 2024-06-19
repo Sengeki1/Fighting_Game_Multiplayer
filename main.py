@@ -6,6 +6,7 @@ from player import Player
 from settings import *
 from databaseConn import DatabaseConn
 from network import Network
+import time
 
 class Player2(pg.sprite.Sprite):
     def __init__(self, pos, character) -> None:
@@ -98,11 +99,11 @@ class Main():
         self.data = 0
         self.authenticated = False
         self.message = ""
-        self.logged = 0
         self.text1 = ''
         self.text2 = ''
         self.clicked1 = False
         self.clicked2 = False
+        self.logged = 0
 
         # Audio
         music = pg.mixer.Sound('Sound/MysticalForest1.wav')
@@ -131,6 +132,8 @@ class Main():
         # init
         self.init_timer = 100
         self.init_message = True
+        self.restart = False
+        self.duration = 50
 
         # Background
         self.background = pg.image.load('Sprites/Background/Background.png').convert_alpha()
@@ -263,33 +266,17 @@ class Main():
                                 self.text1 += event.unicode
                             if len(self.text2) < 18 and self.clicked2:
                                 self.text2 += event.unicode
-
-                if self.game_active == False:
+                                
+                if self.game_active == False and self.restart:
                     if event.type == pg.KEYDOWN:
                         if event.key == pg.K_RETURN:
                             self.game_active = True
                             self.init_timer = 100
+                            self.init_message = False
 
             ####### LOGIN & REGISTER ###############
-            if self.authenticated:
+            if self.authenticated and self.logged == 0:
                 self.screen.fill((0, 0, 0))
-
-                self.databaseServer.send({"stop": True})
-
-                self.n = Network()
-
-                self.player_data = self.n.getP()
-                self.message = self.player_data['message']
-
-                self.player1_sprite = Player(
-                    (self.player_data['player_data']['position'][0], self.player_data['player_data']['position'][1]),
-                    self.player_data['player_data']['character'])
-                self.player1.add(self.player1_sprite)
-
-                self.init_player2_stats = self.n.send(self.player1_sprite.get_data())
-                self.player2 = Player2((self.init_player2_stats['position'][0], self.init_player2_stats['position'][1]),
-                                       self.init_player2_stats['character'])
-                self.p2.add(self.player2)
 
                 self.message = self.font.render(f'Press <Enter> to start!', False, (255, 255, 255))
                 self.message_rect = self.message.get_rect(center = (960, 300))
@@ -315,8 +302,37 @@ class Main():
                 self.final_message_rect = self.final_message.get_rect(center = (960, 1000))
                 self.screen.blit(self.final_message, self.final_message_rect)
 
-                if self.message == "START":
+                self.databaseServer.send({"stop": True})
+
+                self.duration -= 1
+                print(self.duration)
+                if self.duration <= 0:
+                    self.n = Network()
+
+                    self.player_data = self.n.getP()
+                    self.message = self.player_data['message']
+
+                    self.player1_sprite = Player(
+                        (self.player_data['player_data']['position'][0], self.player_data['player_data']['position'][1]),
+                        self.player_data['player_data']['character']
+                    )
+                    self.player1.add(self.player1_sprite)
+
+                    self.init_player2_stats = self.n.send(self.player1_sprite.get_data())
+                    self.player2 = Player2(
+                        (self.init_player2_stats['position'][0], self.init_player2_stats['position'][1]),
+                        self.init_player2_stats['character']
+                    )
+                    self.p2.add(self.player2)
+                    print("connected")
+
                     self.logged = 1
+
+            if self.logged == 1:
+                if self.message == "START":
+                    self.game_active = True
+                    self.init_timer = 100
+                    self.logged = 2
 
             if self.authenticated == False:
                 self.screen.fill((0, 0, 0))
@@ -342,8 +358,8 @@ class Main():
                 txt_surface_2 = self.normal_font.render(self.text2, True, (0, 255, 0))
                 self.screen.blit(txt_surface_2, self.click_Rect_2)
 
-            if self.game_active and self.logged == 1:
-
+            if self.game_active:
+                self.restart = False
                 self.clock.tick(60)
 
                 self.player2_sprite = self.n.send(self.player1_sprite.get_data())
@@ -458,12 +474,13 @@ class Main():
                     self.player1_sprite.get_health()
                     self.player2.get_health()
 
-                else:
-                    self.screen.fill((0, 0, 0))
-                    self.screen.blit(self.restart_surf, self.restart_rect)
+            elif self.game_active == False and self.authenticated and self.logged == 2:
+                self.restart = True
+                self.screen.fill((0, 0, 0))
+                self.screen.blit(self.restart_surf, self.restart_rect)
 
-                    self.player1_sprite.get_health()
-                    self.player2.get_health()
+                self.player1_sprite.get_health()
+                self.player2.get_health()
 
             pg.display.update()
 

@@ -41,6 +41,7 @@ def threaded_client(conn):
 
             if "stop" in data:
                 break
+            
             username = data["username"]
             password = data["password"]
             if username and password:
