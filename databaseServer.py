@@ -3,8 +3,8 @@ import socket
 import pickle
 import requests
 
-server = "192.168.1.69"
-port = 3030
+server = "192.168.5.179"
+port = 4000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

@@ -135,7 +135,7 @@ class Player(pg.sprite.Sprite):
 
                 if self.hitted:
                     self.hitted = False
-                    self.get_damage(150)
+                    self.get_damage(40)
             else:
                 if key[pg.K_e] and self.ready:
                     self.status = 'Attack2'
@@ -145,7 +145,7 @@ class Player(pg.sprite.Sprite):
 
                     if self.hitted:
                         self.hitted = False
-                        self.get_damage(150)
+                        self.get_damage(40)
 
     def apply_gravity(self) -> None:
         self.gravity += 0.8
@@ -193,6 +193,7 @@ class Player(pg.sprite.Sprite):
             'frame_index': self.frame_index,
             'direction': self.direction,
             'gravity': self.gravity,
+            'stop': self.stop
         }
     
     def update_data(self, data):
@@ -204,6 +205,7 @@ class Player(pg.sprite.Sprite):
         self.hp = data['hp']
         self.ready = data['ready']
         self.lose = data['lose']
+        self.stop = data['stop']
         self.hitted = data['hitted']
         self.frame_index = data['frame_index']
         self.character = data['character']
