@@ -133,6 +133,7 @@ class Main():
         self.init_message = True
         self.restart = False
         self.duration = 50
+        self.game_end = False
 
         # Background
         self.background = pg.image.load('Sprites/Background/Background.png').convert_alpha()
@@ -265,10 +266,10 @@ class Main():
                             if len(self.text2) < 18 and self.clicked2:
                                 self.text2 += event.unicode
                                 
-                if self.game_active == False and self.restart:
+                if self.restart:
                     if event.type == pg.KEYDOWN:
                         if event.key == pg.K_RETURN:
-                            self.game_active = True
+                            self.game_end = False
                             self.init_timer = 100
 
             if self.authenticated and self.logged == 0:
@@ -330,27 +331,27 @@ class Main():
 
             if self.authenticated == False:
                 self.screen.fill((0, 0, 0))
-                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 200, (SCREEN_HEIGHT / 2) - 300, 400, 600))
+                pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 200, (SCREEN_HEIGHT / 2) - 300, 400, 600), 0, 15)
 
                 # User
-                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 50))
-                self.click_Rect_1 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40))
+                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 50), 0, 15)
+                self.click_Rect_1 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) - 95, 290, 40), 0, 15)
                 self.username = self.normal_font.render(f'Username', False, (255, 0, 0))
                 self.username_rect = self.username.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 130))
                 self.screen.blit(self.username, self.username_rect)
 
                 # Password
-                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 50, 300, 50))
-                self.click_Rect_2 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40))
+                pg.draw.rect(self.screen, "gray", ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 50, 300, 50), 0, 15)
+                self.click_Rect_2 = pg.draw.rect(self.screen, "white", ((SCREEN_WIDTH / 2) - 145, (SCREEN_HEIGHT / 2) + 55, 290, 40), 0, 15)
                 self.password = self.normal_font.render(f'Password', False, (255, 0, 0))
                 self.password_rect = self.password.get_rect(topleft=((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) + 20))
                 self.screen.blit(self.password, self.password_rect)
 
-                txt_surface = self.normal_font.render(self.text1, True, (0, 255, 0))
-                self.screen.blit(txt_surface, self.click_Rect_1)
+                txt_surface = self.normal_font.render(self.text1, True, (0, 0, 0))
+                self.screen.blit(txt_surface, (self.click_Rect_1.x + 10, self.click_Rect_1.y + 10))
 
-                txt_surface_2 = self.normal_font.render(self.text2, True, (0, 255, 0))
-                self.screen.blit(txt_surface_2, self.click_Rect_2)
+                txt_surface_2 = self.normal_font.render('*'*len(self.text2), True, (0, 0, 0))
+                self.screen.blit(txt_surface_2, (self.click_Rect_2.x + 10, self.click_Rect_2.y + 12))
 
             if self.game_active:
                 self.restart = False
@@ -366,6 +367,7 @@ class Main():
                     self.player2.ready = self.player2_sprite['ready']
                     self.player2.hp = self.player2_sprite['hp']
                     self.player2.direction.x = self.player2_sprite['direction'][0]
+                    self.player2.stop = self.player2_sprite['stop']
                     self.player2.direction.y = self.player2_sprite['direction'][1]
                     self.player2.facing_right = self.player2_sprite['facing_right']
                     self.player2.gravity = self.player2_sprite['gravity']
@@ -456,7 +458,7 @@ class Main():
                     self.scoreA = 0
                     self.scoreB = 0
 
-                    self.game_active = False
+                    self.game_end = True
 
                 if self.init_timer > 0:
                     self.init_timer -= 1
@@ -468,8 +470,7 @@ class Main():
                     self.player1_sprite.get_health()
                     self.player2.get_health()
 
-            else:
-                if self.game_active == False and self.authenticated and self.logged == 2:
+                if self.game_end:
                     self.restart = True
                     self.screen.fill((0, 0, 0))
                     self.screen.blit(self.restart_surf, self.restart_rect)
